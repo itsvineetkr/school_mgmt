@@ -16,8 +16,17 @@ from django.db.models import F
 def dashboard(request):
     if request.user.is_anonymous:
         return redirect("/")
+
     if request.user.role == "principal":
-        return render(request, "schools/dash-principal.html")
+        context = {
+            "user": request.user,
+        }
+        try:
+            school = AccountAffiliation.objects.get(account=request.user).school
+            context["school"] = school
+        except AccountAffiliation.DoesNotExist:
+            context["school"] = None
+        return render(request, "schools/dash-principal.html", context)
     if request.user.role == "teacher":
         standards = [
             (standard.standard, standard.section)
@@ -28,9 +37,19 @@ def dashboard(request):
             if standard.standard not in unique_standards:
                 unique_standards.append(standard.standard)
 
-        context = {"unique_standards": sorted(unique_standards), "standards": standards}
+        user = request.user
+        try:
+            school = AccountAffiliation.objects.get(account=request.user).school
+            context["school"] = school
+        except AccountAffiliation.DoesNotExist:
+            context["school"] = None
+        context = {
+            "unique_standards": sorted(unique_standards),
+            "standards": standards,
+            "user": user,
+            "school": school,
+        }
 
-        print(context)
         return render(request, "schools/dash-teacher.html", context)
 
     if request.user.role == "student":
@@ -38,10 +57,12 @@ def dashboard(request):
             student = ClassAssessment.objects.get(account=request.user)
             context = {
                 "student": student,
+                "user": request.user,
+                "school": student.school,
             }
         except ClassAssessment.DoesNotExist:
             context = {"error": "Student not found"}
-        return render(request, "schools/dash-student.html", {})
+        return render(request, "schools/dash-student.html", context=context)
 
 
 @api_view(["POST"])
@@ -951,3 +972,32 @@ def add_attendance(request):
     return Response(
         {"status": 200, "message": "Attendance records added successfully"}, status=200
     )
+
+
+@api_view(["POST"])
+def change_password(request):
+    if request.user.is_anonymous:
+        return Response({"status": 401, "message": "Unauthorized"}, status=401)
+
+    try:
+        data = request.data
+        old_password = data.get("old_password")
+        new_password = data.get("new_password")
+
+        if not old_password or not new_password:
+            return Response(
+                {"status": 400, "message": "Missing password fields"}, status=400
+            )
+
+        user = request.user
+        if not user.check_password(old_password):
+            return Response(
+                {"status": 400, "message": "Invalid old password"}, status=400
+            )
+
+        user.set_password(new_password)
+        user.save()
+        return Response({"status": 200, "message": "Password updated successfully"})
+
+    except Exception as e:
+        return Response({"status": 400, "message": str(e)}, status=400)

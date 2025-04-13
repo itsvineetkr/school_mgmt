@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href={% static 'css/schools/dashboard.css' %}>
+    <link rel="stylesheet" href={% static 'css/accounts/profile.css' %}>
     {% block style %}{% endblock style %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,8 +25,72 @@
             <div class="navbar">
                 <div class="nav-button"><i class="fa-solid fa-bars"></i></div>
                 <div class="navbar-icons">
-                    <a href="">Notifications</a>
-                    <a href="">Profile</a>
+                    <button class="profile-toggle">Profile</button>
+                </div>
+            </div>
+            <div class="up-profile-page-wrapper">
+                <div class="up-profile-container">
+                    <div class="up-profile-header">
+                        <h1 class="up-profile-title">User Profile</h1>
+                        <div class="up-user-name">{{ user.username }}</div>
+                    </div>
+                    
+                    <div class="up-profile-body">
+                        <div class="up-alert up-alert-success" id="upSuccessAlert">Password changed successfully!</div>
+                        <div class="up-alert up-alert-error" id="upErrorAlert">Current password is incorrect!</div>
+                        
+                        <div class="up-profile-section">
+                            <h2 class="up-section-title">Account Information</h2>
+                            <div class="up-info-item">
+                                <div class="up-info-label">Username:</div>
+                                <div class="up-info-value">{{user.username}}</div>
+                            </div>
+                            <div class="up-info-item">
+                                <div class="up-info-label">Email:</div>
+                                <div class="up-info-value">{{user.email}}</div>
+                            </div>
+                            <div class="up-info-item">
+                                <div class="up-info-label">Institution:</div>
+                                <div class="up-info-value">{{school.schoolName}}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="up-profile-section">
+                            <h2 class="up-section-title">
+                                Security
+                                <button class="up-edit-button" id="upChangePasswordBtn">Change Password</button>
+                            </h2>
+                            <div class="up-info-item">
+                                <div class="up-info-label">Password:</div>
+                                <div class="up-info-value">••••••••</div>
+                            </div>
+                            
+                            <!-- Password Change Form -->
+                            <div class="up-password-form" id="upPasswordForm">
+                                <form id="upChangePasswordForm">
+                                    <div class="up-form-group">
+                                        <label for="upCurrentPassword">Current Password</label>
+                                        <input type="password" id="upCurrentPassword" class="up-form-control" required>
+                                    </div>
+                                    <div class="up-form-group">
+                                        <label for="upNewPassword">New Password</label>
+                                        <input type="password" id="upNewPassword" class="up-form-control" required>
+                                        <div class="up-password-requirements">
+                                            Must be at least 8 characters long, include uppercase, lowercase, numbers, and special characters.
+                                        </div>
+                                    </div>
+                                    <div class="up-form-group">
+                                        <label for="upConfirmPassword">Confirm New Password</label>
+                                        <input type="password" id="upConfirmPassword" class="up-form-control" required>
+                                    </div>
+                                    <div class="up-button-group">
+                                        <button type="button" class="up-btn up-btn-secondary" id="upCancelPasswordBtn">Cancel</button>
+                                        <button type="submit" class="up-btn up-btn-primary">Update Password</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="content">
@@ -33,6 +98,7 @@
             </div>
         </div>
     </div>
+    
 </body>
 
 <script>
@@ -49,6 +115,128 @@
         }
     });
 
+    content = document.querySelector('.content');
+    profilePageContainer = document.querySelector('.up-profile-page-wrapper');
+    profilePageContainer.style.display = 'none';
+
+    sidebar.addEventListener('click', (event) => {
+        profilePageContainer.style.display = 'none';
+        content.style.display = 'block';
+    });
+
+    profilePageToggle = document.querySelector('.profile-toggle');
+    profilePageToggle.addEventListener('click', () => {
+        if (profilePageContainer.style.display === 'none') {
+            profilePageContainer.style.display = 'block';
+            content.style.display = 'none';
+        } else {
+            profilePageContainer.style.display = 'none';
+            content.style.display = 'block';
+        }
+    });
+
+
+    const changePasswordBtn = document.getElementById('upChangePasswordBtn');
+    const cancelPasswordBtn = document.getElementById('upCancelPasswordBtn');
+    const passwordForm = document.getElementById('upPasswordForm');
+    const changePasswordForm = document.getElementById('upChangePasswordForm');
+    const successAlert = document.getElementById('upSuccessAlert');
+    const errorAlert = document.getElementById('upErrorAlert');
+    const currentPasswordInput = document.getElementById('upCurrentPassword');
+    const newPasswordInput = document.getElementById('upNewPassword');
+    const confirmPasswordInput = document.getElementById('upConfirmPassword');
+    
+    // Toggle password form visibility
+    changePasswordBtn.addEventListener('click', () => {
+        passwordForm.style.display = 'block';
+        changePasswordBtn.style.display = 'none';
+    });
+    
+    cancelPasswordBtn.addEventListener('click', () => {
+        passwordForm.style.display = 'none';
+        changePasswordBtn.style.display = 'inline';
+        resetForm();
+    });
+    
+    // Handle form submission
+    changePasswordForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Hide previous alerts
+        successAlert.style.display = 'none';
+        errorAlert.style.display = 'none';
+        
+        const currentPassword = currentPasswordInput.value;
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        
+        if (newPassword.length < 8) {
+            errorAlert.textContent = 'New password must be at least 8 characters long!';
+            errorAlert.style.display = 'block';
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            errorAlert.textContent = 'New passwords do not match!';
+            errorAlert.style.display = 'block';
+            return;
+        }
+        
+        // Password validation - check for complexity requirements
+        const hasUpperCase = /[A-Z]/.test(newPassword);
+        const hasLowerCase = /[a-z]/.test(newPassword);
+        const hasNumbers = /\d/.test(newPassword);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+        
+        if (!(hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar)) {
+            errorAlert.textContent = 'Password must include uppercase, lowercase, numbers, and special characters!';
+            errorAlert.style.display = 'block';
+            return;
+        }
+        
+        // Send API request to change password
+        fetch('api/change-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                old_password: currentPassword,
+                new_password: newPassword
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 200) {
+                successAlert.style.display = 'block';
+                passwordForm.style.display = 'none';
+                changePasswordBtn.style.display = 'inline';
+            } else {
+                errorAlert.textContent = data.message;
+                errorAlert.style.display = 'block';
+                return;
+            }
+        })
+        .catch(error => {
+            errorAlert.textContent = 'An error occurred. Please try again.';
+            errorAlert.style.display = 'block';
+        });
+
+        resetForm();
+        
+        // Update password display
+        const passwordValue = document.querySelector('.up-info-value');
+        passwordValue.textContent = '••••••••';
+    });
+    
+    // Reset form fields and errors
+    function resetForm() {
+        changePasswordForm.reset();
+        errorAlert.style.display = 'none';
+    }
+    
 </script>
 {% block script %}{% endblock script %}
 </html>

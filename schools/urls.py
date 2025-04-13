@@ -5,6 +5,7 @@ from schools import views
 urlpatterns = [
     path("api/add_principal", views.add_principal, name="add_principal"),
     path("api/fetch_class_data/", views.fetch_class_data, name="fetch_class_data"),
+    path("api/change-password", views.change_password, name="change_password"),
     path("api/add_student", views.add_student, name="add_student"),
     path("api/bulk_add_student", views.bulk_add_student, name="bulk_add_student"),
     path("api/add_teacher", views.add_teacher, name="add_teacher"),
