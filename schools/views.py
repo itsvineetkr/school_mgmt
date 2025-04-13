@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 from accounts.models import CustomUser
 from schools.models import ClassAssessment, AccountAffiliation, Event
 from schools.validation import validate_section, validate_standard
@@ -49,12 +50,12 @@ def add_principal(request):
     In a json give the following details:
 
     {
-        "name": "John Smith",
-        "email": "johnsmith@school.edu",
-        "phoneno": "9876543210",
+        "name": "Vineet Kumar",
+        "email": "vineet@gmail.com",
+        "phoneno": "9555648766",
         "gender": "m",
-        "dob": "1980-05-15",
-        "password": "SecurePassword123!"
+        "dob": "2004-12-10",
+        "password": "7686"
     }
     """
     if request.user.is_anonymous:
@@ -148,6 +149,14 @@ def add_student(request):
         )
 
     school = AccountAffiliation.objects.get(account=request.user).school
+
+    # Check if the student already exists
+    if CustomUser.objects.filter(email=email, role="student").exists():
+        return Response(
+            {"status": 400, "message": "Student with this email already exists"},
+            status=400,
+        )
+
     studentAccount = CustomUser(
         email=email,
         username=name,
@@ -164,6 +173,16 @@ def add_student(request):
     studentAccount.save()
 
     AccountAffiliation(school=school, account=studentAccount).save()
+
+    # Create a ClassAssessment entry for the student
+    # Check if the class assessment already exists
+    if ClassAssessment.objects.filter(
+        school=school, standard=standard, section=section, role="student"
+    ).exists():
+        return Response(
+            {"status": 400, "message": "Class assessment already exists"}, status=400
+        )
+
     ClassAssessment(
         school=school,
         standard=standard,
@@ -455,6 +474,18 @@ def bulk_add_student(request):
 
     for student in data:
         try:
+            # Check if the student already exists
+            if CustomUser.objects.filter(
+                email=student["email"], role="student"
+            ).exists():
+                return Response(
+                    {
+                        "status": 400,
+                        "message": f"Student with email {student['email']} already exists",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             studentAccount = CustomUser(
                 email=student["email"],
                 username=student["name"],
@@ -469,6 +500,21 @@ def bulk_add_student(request):
             studentAccount.save()
 
             AccountAffiliation(school=school, account=studentAccount).save()
+            # Check if the class assessment already exists
+            if ClassAssessment.objects.filter(
+                school=school,
+                standard=int(student["standard"]),
+                section=str(student["section"]).lower(),
+                role="student",
+            ).exists():
+                return Response(
+                    {
+                        "status": 400,
+                        "message": f"Class assessment for {student['name']} already exists",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            # Create a ClassAssessment entry for the student
             ClassAssessment(
                 school=school,
                 standard=int(student["standard"]),

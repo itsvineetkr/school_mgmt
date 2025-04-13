@@ -335,60 +335,136 @@ class AssessmentGenerator:
         return assessment
 
 
-def generate_assessment():
-    """Interactive function to generate an assessment"""
-    print("AI Assessment Generator")
-    print("-----------------------")
+[
+    {
+        "question-type": "MCQ",
+        "question": "If the discriminant of a quadratic equation is zero, the roots are:",
+        "options": ["Real and distinct", "Imaginary", "Real and equal", "Irrational"],
+        "answer": 2,
+    },
+    {
+        "question-type": "MCQ",
+        "question": "Which of the following is an example of an arithmetic progression (AP)?",
+        "options": [
+            "1, 4, 9, 16...",
+            "2, 4, 8, 16...",
+            "1, 3, 5, 7...",
+            "1, 2, 4, 8...",
+        ],
+        "answer": 2,
+    },
+    {
+        "question-type": "MCQ",
+        "question": "The sum of the first 'n' natural numbers is given by:",
+        "options": ["n(n+1)", "n(n-1)/2", "n(n+1)/2", "n^2"],
+        "answer": 2,
+    },
+    {
+        "question-type": "Written",
+        "question": "Solve the following quadratic equation using the quadratic formula: 2x² + 5x - 3 = 0",
+        "answer": "The quadratic formula is x = (-b ± √(b² - 4ac)) / 2a.  In this equation, a = 2, b = 5, and c = -3.  Substituting these values, we get x = (-5 ± √(5² - 4 * 2 * -3)) / (2 * 2) = (-5 ± √(25 + 24)) / 4 = (-5 ± √49) / 4 = (-5 ± 7) / 4.  Therefore, x = (-5 + 7) / 4 = 2/4 = 1/2 or x = (-5 - 7) / 4 = -12/4 = -3. The solutions are x = 1/2 and x = -3.",
+    },
+    {
+        "question-type": "Written",
+        "question": "The sum of the first n terms of an arithmetic progression is given by Sn = n/2[2a + (n-1)d], where a is the first term and d is the common difference. If the sum of the first 10 terms of an AP is 210 and the first term is 2, find the common difference.",
+        "answer": "Given Sn = 210, n = 10, and a = 2.  We have 210 = 10/2[2(2) + (10-1)d] => 210 = 5[4 + 9d] => 42 = 4 + 9d => 38 = 9d => d = 38/9.",
+    },
+]
 
-    assessment_name = input("Enter assessment name: ")
-    assessment_description = input("Enter assessment description: ")
 
-    question_type_options = {"1": "MCQ", "2": "Written", "3": "Mix"}
-    print("\nSelect question type:")
-    for key, value in question_type_options.items():
-        print(f"{key}: {value}")
+def evaluate_written_answers(written_answers: List[Dict]) -> List[Dict]:
+    """Evaluate written answers using AI and return structured feedback"""
 
-    question_type_choice = input("Enter your choice (1-3): ")
-    question_types = question_type_options.get(question_type_choice, "Mix")
+    model = genai.GenerativeModel("gemini-2.0-flash")
 
-    standard = input("\nEnter class/standard (e.g., 10): ")
+    eval_prompt = """
+    You are an expert teacher evaluating student answers. For each answer:
+    1. Compare it with the model answer
+    2. Determine if it's substantially correct (capturing main points)
+    3. Provide brief, constructive feedback
+
+    Return ONLY a JSON array in this exact format:
+    [
+        {
+            "question": "What is photosynthesis?",
+            "correct": true,
+            "remark": "Good explanation of the process. Covered key points about light energy and glucose production."
+        }
+    ]
+
+    Here are the answers to evaluate:
+    """ + json.dumps(
+        written_answers, indent=2
+    )
 
     try:
-        num_questions = int(input("\nEnter number of questions (default 5): ") or "5")
-    except ValueError:
-        num_questions = 5
+        response = model.generate_content(eval_prompt)
+        # Try multiple JSON extraction methods
+        try:
+            evaluations = json.loads(response.text)
+        except json.JSONDecodeError:
+            # Look for JSON between code blocks
+            json_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", response.text)
+            if json_match:
+                evaluations = json.loads(json_match.group(1))
+            else:
+                raise ValueError("Could not extract valid JSON")
 
-    print("\nGenerating assessment...")
-    generator = AssessmentGenerator()
+        # Validate structure
+        for eval in evaluations:
+            if not all(k in eval for k in ["question", "correct", "remark"]):
+                raise ValueError("Invalid evaluation structure")
 
-    try:
-        assessment = generator.generate_assessment(
-            assessment_name=assessment_name,
-            assessment_description=assessment_description,
-            question_types=question_types,
-            standard=standard,
-            num_questions=num_questions,
-        )
-
-        # Save to file and display
-        output_file = f"{assessment_name.replace(' ', '_').lower()}_assessment.json"
-        with open(output_file, "w") as f:
-            json.dump(assessment, f, indent=2)
-
-        print(f"\nAssessment generated and saved to {output_file}")
-        print("\nPreview of assessment questions:")
-        for i, question in enumerate(assessment, 1):
-            print(f"\nQuestion {i} ({question['question-type']}):")
-            print(question["question"])
-            if question["question-type"] == "MCQ":
-                for j, option in enumerate(question["options"]):
-                    print(f"  {j}: {option}")
-                print(f"  Correct answer: {question['answer']}")
+        return evaluations
 
     except Exception as e:
-        print(f"Error generating assessment: {e}")
-        print("Please check your API key and try again.")
+        print(f"Error evaluating answers: {e}")
+        # Return basic feedback if AI evaluation fails
+        return [
+            {
+                "question": ans["question"],
+                "correct": False,
+                "remark": "Could not evaluate answer due to technical error",
+            }
+            for ans in written_answers
+        ]
 
 
-if __name__ == "__main__":
-    generate_assessment()
+def calculate_score(
+    correct_answers: List[Dict],
+    student_answers: List[Dict],
+):
+    score = 0
+    max_score = len(correct_answers)
+
+    written_answers = []
+
+    for i in range(len(correct_answers)):
+        if correct_answers[i]["question-type"] == "MCQ":
+            answered = False if student_answers[i]["answer"] in ["", None] else True
+            if answered and int(correct_answers[i]["answer"]) == int(
+                student_answers[i]["answer"]
+            ):
+                score += 1
+                print()
+
+        elif correct_answers[i]["question-type"] == "Written":
+            answered = False if student_answers[i]["answer"] in ["", None] else True
+            if answered:
+                written_answers.append(
+                    {
+                        "question": correct_answers[i]["question"],
+                        "model_answer": correct_answers[i]["answer"],
+                        "student_answer": student_answers[i]["answer"],
+                    }
+                )
+
+    # Evaluate written answers using AI
+    evaluations = evaluate_written_answers(written_answers)
+    print(evaluations)
+    remarks = []
+    for i in range(len(evaluations)):
+        if evaluations[i]["correct"]:
+            score += 1
+        remarks.append(evaluations[i]["remark"])
+    return max_score, score, remarks

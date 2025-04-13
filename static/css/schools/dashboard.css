@@ -541,3 +541,56 @@ body a{
         max-width: 300px;
     }
 }
+
+.assessment-result{
+    width: 400px;
+    max-width: 90vw;
+    padding: 20px;
+    border-radius: 12px;
+    background-color: rgb(30, 32, 33);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+
+.assessment-result h1{
+    font-size: 20px;
+    width: 100%;
+    text-align: left;
+}
+.assessment-result p{
+    font-size: 16px;
+    width: 100%;
+    text-align: left;
+    color: #cccc;
+}
+
+
+.assessment-result span{
+    color: white;
+}
+
+.assessment-result .close-button{
+    margin: 20px 0px 0px 0px;
+    width: 90%;
+    background-color: rgb(212, 85, 85);
+}
+
+.assessment-result .close-button:hover{
+    background-color: rgb(224, 71, 71);
+    cursor: pointer;
+}
+
+.missed-assessment {
+    color: rgb(224, 71, 71);
+    margin: 20px 0px 0px 0px;
+    font-size: 16px;
+}

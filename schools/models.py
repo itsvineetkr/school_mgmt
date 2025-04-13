@@ -32,19 +32,15 @@ class AccountAffiliation(models.Model):
 
 
 class ClassAssessment(models.Model):
-    account = models.ForeignKey(
-        "accounts.CustomUser",
-        on_delete=models.CASCADE,
-        null=False,
-        blank=False,
-        unique=True,
-    )
     school = models.ForeignKey(RegisteredSchool, on_delete=models.CASCADE)
     standard = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(12)],
     )
     section = models.CharField(max_length=1)
     role = models.CharField(choices=ROLE_CHOICES, max_length=10)
+    account = models.ForeignKey(
+        "accounts.CustomUser", on_delete=models.CASCADE, null=False, blank=False
+    )
 
     def __str__(self):
         return f"{self.standard} - {self.account.username}"

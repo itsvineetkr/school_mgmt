@@ -92,14 +92,26 @@
                 throw new Error(error.message)
             })
         }
+    
+        function clearPreviousAssessmentData() {
+            // Clear any assessment data that's not related to the current assessment
+            const currentPrefix = `assessment_${assessmentId}_`;
+            
+            // Scan localStorage for any assessment keys
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                // If it's an assessment key but not for the current assessment, remove it
+                if (key && key.startsWith('assessment_') && !key.startsWith(currentPrefix)) {
+                    localStorage.removeItem(key);
+                }
+            }
+        }
+
         // Assessment data
         const assessmentData = JSON.parse("{{ assessment.assessment|escapejs|safe }}");
         const assessmentDuration = parseInt("{{ assessment.duration }}"); // Duration in minutes
         const assessmentId = "{{ assessment.id }}"; // Unique identifier for this assessment
-        
-        console.log(assessmentData);
-
-
+    
         // Variables to track state
         let currentQuestionIndex = 0;
         let answers = new Array(assessmentData.length).fill(null);
@@ -129,6 +141,7 @@
 
         // Initialize the assessment
         function initializeAssessment() {
+            clearPreviousAssessmentData(); // Clear data from other assessments
             renderQuestions();
             renderProgressIndicator();
             loadSavedState();
@@ -152,23 +165,42 @@
 
         // Load saved state from localStorage
         function loadSavedState() {
+            // First check if the saved state belongs to the current assessment
+            const savedAssessmentId = localStorage.getItem(`${storageKeyPrefix}id`);
+            
+            // If no saved assessment ID or different from current one, start fresh
+            if (!savedAssessmentId || savedAssessmentId !== assessmentId) {
+                // Clear any data for this assessment that might exist
+                clearAssessmentData();
+                // Set fresh timer
+                remainingTime = assessmentDuration * 60;
+                // Save the current assessment ID
+                localStorage.setItem(`${storageKeyPrefix}id`, assessmentId);
+                return;
+            }
+            
             // Check if we have saved answers
             const savedAnswers = localStorage.getItem(ANSWERS_KEY);
             if (savedAnswers) {
-                answers = JSON.parse(savedAnswers);
-                
-                // Mark saved answers in the UI
-                answers.forEach((answer, index) => {
-                    if (answer !== null) {
-                        if (assessmentData[index]['question-type'] === 'MCQ' && typeof answer === 'number') {
-                            const radioBtn = document.querySelector(`input[name="question-${index}"][value="${answer}"]`);
-                            if (radioBtn) radioBtn.checked = true;
-                        } else if (assessmentData[index]['question-type'] === 'Written') {
-                            const textarea = document.querySelector(`textarea[name="written-${index}"]`);
-                            if (textarea) textarea.value = answer;
+                try {
+                    answers = JSON.parse(savedAnswers);
+                    
+                    // Mark saved answers in the UI
+                    answers.forEach((answer, index) => {
+                        if (answer !== null) {
+                            if (assessmentData[index]['question-type'] === 'MCQ' && typeof answer === 'number') {
+                                const radioBtn = document.querySelector(`input[name="question-${index}"][value="${answer}"]`);
+                                if (radioBtn) radioBtn.checked = true;
+                            } else if (assessmentData[index]['question-type'] === 'Written') {
+                                const textarea = document.querySelector(`textarea[name="written-${index}"]`);
+                                if (textarea) textarea.value = answer;
+                            }
                         }
-                    }
-                });
+                    });
+                } catch (e) {
+                    console.error('Error parsing saved answers:', e);
+                    answers = new Array(assessmentData.length).fill(null);
+                }
             }
             
             // Check if we have a saved timer
@@ -448,6 +480,7 @@
             localStorage.removeItem(TIMER_KEY);
             localStorage.removeItem(ANSWERS_KEY);
             localStorage.removeItem(START_TIME_KEY);
+            localStorage.removeItem(`${storageKeyPrefix}id`);
         }
 
         // Submit assessment
@@ -473,14 +506,11 @@
             .then(handleResponse)
             .then(data => {
                 const response = data.response;
+                clearAssessmentData();
             })
             .catch(error => {
                 console.error('Error submitting assessment:', error);
             });
-
-
-            // Clear stored data as we're done with the assessment
-            clearAssessmentData();
             
             // Redirect to dashboard
             window.location.href = "/schools/dashboard";

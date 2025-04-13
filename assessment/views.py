@@ -3,9 +3,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from assessment.models import AssessmentStore, AssessmentSubmission
 from schools.models import RegisteredSchool, AccountAffiliation
-from datetime import datetime
+from datetime import datetime, date
 from rest_framework import status
-from assessment.utils import AssessmentGenerator
+from assessment.utils import AssessmentGenerator, calculate_score
 from schools.models import RegisteredSchool, AccountAffiliation, ClassAssessment
 from django.http import HttpResponse
 import json
@@ -205,6 +205,10 @@ def get_assessments(request):
                     )
                     break
             else:
+                if assessment.due_date < date.today():
+                    submit_status = "missed"
+                else:
+                    submit_status = "not_submitted"
                 assessments_list.append(
                     {
                         "id": assessment.id,
@@ -216,7 +220,7 @@ def get_assessments(request):
                         "due_date": assessment.due_date,
                         "duration": assessment.duration,
                         "teacher": assessment.teacher.username,
-                        "status": "not_submitted",
+                        "status": submit_status,
                         "max_score": None,
                         "obtained_score": None,
                         "remark": None,
@@ -287,7 +291,6 @@ def take_assessment(request, assessment_id):
 
     try:
         assessment = AssessmentStore.objects.get(id=assessment_id, school=school)
-        print("Assessment details:", assessment.assessment)
         assessment.assessment = json.dumps(assessment.assessment)
     except AssessmentStore.DoesNotExist:
         return HttpResponse("No such assessment found!", status=404)
@@ -319,9 +322,7 @@ def submit_assessment(request):
         )
 
     assessment_id = data.get("assessment_id")
-    assessment = data.get("assessment")
-
-    print(assessment)
+    given_assessment = data.get("assessment")
 
     try:
         classAssessment = ClassAssessment.objects.get(account=request.user)
@@ -336,27 +337,30 @@ def submit_assessment(request):
     section = classAssessment.section
 
     try:
-        assessment = AssessmentStore.objects.get(id=assessment_id, school=school)
+        correct_assessment = AssessmentStore.objects.get(
+            id=assessment_id, school=school
+        )
     except AssessmentStore.DoesNotExist:
         return Response(
             {"error": "Assessment not found."}, status=status.HTTP_404_NOT_FOUND
         )
 
-    # calculate score and remark
-    remark = None
-    max_score = 0
-    obtained_score = 0
+    max_score, obtained_score, remarks = calculate_score(
+        correct_assessment.assessment, given_assessment
+    )
+
+    remark = "\n".join(remarks) if remarks else ""
 
     try:
         submission = AssessmentSubmission.objects.create(
-            assessment=assessment,
+            assessment=correct_assessment,
             student=request.user,
             standard=standard,
             section=section,
-            max_score=None,
-            obtained_score=None,
-            remark=remark if remark else "No remarks",
-        )
+            max_score=max_score,
+            obtained_score=obtained_score,
+            remark=remark,
+        ).save()
         return Response(
             {"message": "Assessment submitted successfully"},
             status=status.HTTP_201_CREATED,
