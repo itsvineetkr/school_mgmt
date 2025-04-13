@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Preview</title>
+    <style>
+        :root {
+            --primary-color:rgb(109, 109, 109);
+            --accent-color:rgb(149, 149, 150);
+            --light-bg: #f5f7fa;
+            --border-color: #595959;
+            --text-color:rgb(255, 255, 255);
+            --light-text: #718096;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 16px 0;
+            margin-bottom: 30px;
+        }
+        
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .assessment-info {
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .question-card {
+            background-color: #292c2d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .question-type {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.8rem;
+        }
+        
+        .question-text {
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        
+        .options {
+            list-style-type: none;
+        }
+        
+        .option {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .option:hover {
+            background-color:rgb(63, 63, 63);
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+        }
+        
+        .written-question .question-text {
+            margin-bottom: 12px;
+        }
+        
+        .answer-area {
+            background-color: #3a3c3d;
+            border-radius: 4px;
+            padding: 12px;
+            color: var(--light-text);
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .question-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Photosynthesis Assessment (Preview)</h1>
+            <div class="mode-toggle">
+                <a href="assessment-test.html" class="btn btn-primary">Switch to Test Mode</a>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="assessment-info">
+            <h2>Assessment Overview</h2>
+            <p>This assessment contains 10 questions on the topic of photosynthesis, including both multiple-choice and written response questions.</p>
+        </div>
+        
+        <div id="questions-container">
+            <!-- Questions will be populated here -->
+        </div>
+    </div>
+
+    <script>
+        // Assessment data
+        const assessmentData = [
+          {
+            "question-type": "MCQ",
+            "question": "Which pigment is primarily responsible for capturing light energy during photosynthesis?",
+            "options": [
+              "Carotenoids",
+              "Xanthophylls",
+              "Chlorophyll",
+              "Phycobilins"
+            ],
+            "answer": 2
+          },
+          {
+            "question-type": "MCQ",
+            "question": "What is the primary function of the light-dependent reactions in photosynthesis?",
+            "options": [
+              "Fixing carbon dioxide",
+              "Producing glucose",
+              "Splitting water and generating ATP and NADPH",
+              "Regenerating RuBP"
+            ],
+            "answer": 2
+          },
+          {
+            "question-type": "MCQ",
+            "question": "In the Calvin cycle, what molecule is initially carboxylated by CO2?",
+            "options": [
+              "RuBP (Ribulose-1,5-bisphosphate)",
+              "PGA (3-Phosphoglycerate)",
+              "G3P (Glyceraldehyde-3-phosphate)",
+              "NADPH"
+            ],
+            "answer": 0
+          },
+          {
+            "question-type": "MCQ",
+            "question": "Which of the following is the electron donor in the light-dependent reactions of photosynthesis?",
+            "options": [
+              "Carbon dioxide",
+              "Oxygen",
+              "Water",
+              "Glucose"
+            ],
+            "answer": 2
+          },
+          {
+            "question-type": "MCQ",
+            "question": "What enzyme catalyzes the first major step of carbon fixation in the Calvin cycle?",
+            "options": [
+              "ATP synthase",
+              "RuBisCO",
+              "Amylase",
+              "Nitrogenase"
+            ],
+            "answer": 1
+          },
+          {
+            "question-type": "MCQ",
+            "question": "Which of the following is NOT a product of the light-dependent reactions?",
+            "options": [
+              "ATP",
+              "NADPH",
+              "Oxygen",
+              "Glucose"
+            ],
+            "answer": 3
+          },
+          {
+            "question-type": "Written",
+            "question": "Explain the role of the electron transport chain (ETC) in the light-dependent reactions of photosynthesis. What are the key components involved, and how does it contribute to ATP synthesis?",
+            "answer": "The electron transport chain in the light-dependent reactions receives high-energy electrons from chlorophyll. These electrons pass through a series of protein complexes (e.g., Photosystem II, plastoquinone, cytochrome b6f complex, plastocyanin, Photosystem I, ferredoxin, NADP+ reductase) embedded in the thylakoid membrane. As electrons move down the ETC, energy is released, which is used to pump protons (H+) from the stroma into the thylakoid lumen, creating a proton gradient. This proton gradient drives the synthesis of ATP by ATP synthase, a process called chemiosmosis. The final electron acceptor is NADP+, which gets reduced to NADPH, a reducing agent used in the Calvin cycle."
+          },
+          {
+            "question-type": "Written",
+            "question": "Describe the C4 pathway of carbon fixation and explain why it is advantageous for plants in hot and dry environments.",
+            "answer": "The C4 pathway is an alternative carbon fixation pathway used by some plants in hot and dry environments. In C4 plants, CO2 is initially fixed in mesophyll cells by the enzyme PEP carboxylase, which has a higher affinity for CO2 than RuBisCO. PEP carboxylase adds CO2 to phosphoenolpyruvate (PEP) to form oxaloacetate (a 4-carbon compound). Oxaloacetate is then converted to malate or aspartate, which is transported to bundle sheath cells. In the bundle sheath cells, malate or aspartate is decarboxylated, releasing CO2. This CO2 is then fixed by RuBisCO in the Calvin cycle. This spatial separation of initial CO2 fixation and the Calvin cycle minimizes photorespiration, which is more likely to occur at high temperatures when RuBisCO binds to O2 instead of CO2. This pathway is advantageous as it concentrates CO2 in the bundle sheath cells, ensuring efficient carbon fixation even when stomata are partially closed to conserve water in hot and dry climates."
+          },
+          {
+            "question-type": "Written",
+            "question": "Differentiate between cyclic and non-cyclic photophosphorylation, highlighting the products formed in each process and the photosystems involved.",
+            "answer": "Non-cyclic photophosphorylation involves both Photosystem II (PSII) and Photosystem I (PSI). Water is split at PSII, releasing electrons, protons, and oxygen. Electrons pass through the electron transport chain, generating ATP via chemiosmosis. Electrons from PSI reduce NADP+ to NADPH. The products are ATP, NADPH, and oxygen. Cyclic photophosphorylation involves only PSI. Electrons excited by PSI cycle back to PSI through the electron transport chain, generating ATP but not NADPH or oxygen. Cyclic photophosphorylation occurs when NADPH levels are high or when CO2 is limited, ensuring sufficient ATP for the Calvin cycle."
+          },
+          {
+            "question-type": "Written",
+            "question": "Explain the process of photorespiration. Why is it considered a wasteful process, and under what conditions does it occur?",
+            "answer": "Photorespiration is a process that occurs in plants when RuBisCO binds to oxygen (O2) instead of carbon dioxide (CO2). This occurs when CO2 levels are low and O2 levels are high, typically in hot and dry conditions when plants close their stomata to conserve water. Instead of fixing CO2, RuBisCO catalyzes the reaction of O2 with RuBP, producing one molecule of 3-PGA and one molecule of 2-phosphoglycolate. 2-phosphoglycolate must be processed through a series of reactions in the chloroplast, peroxisome, and mitochondria, ultimately releasing CO2. This process consumes ATP and NADPH and does not produce any sugar. Therefore, it is considered a wasteful process because it reduces the efficiency of photosynthesis by decreasing the amount of fixed carbon available for carbohydrate production."
+          }
+        ];
+
+        // Function to render questions
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            
+            assessmentData.forEach((question, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = `question-card ${question['question-type'].toLowerCase()}-question`;
+                
+                let questionHTML = `
+                    <div class="question-header">
+                        <span>Question ${index + 1}</span>
+                        <span class="question-type">${question['question-type']}</span>
+                    </div>
+                    <div class="question-text">${question.question}</div>
+                `;
+                
+                if (question['question-type'] === 'MCQ') {
+                    questionHTML += `<ul class="options">`;
+                    question.options.forEach((option, optIndex) => {
+                        questionHTML += `<li class="option">${String.fromCharCode(65 + optIndex)}. ${option}</li>`;
+                    });
+                    questionHTML += `</ul>`;
+                } else if (question['question-type'] === 'Written') {
+                    questionHTML += `<div class="answer-area">Answer area will be available in test mode</div>`;
+                }
+                
+                questionElement.innerHTML = questionHTML;
+                container.appendChild(questionElement);
+            });
+        }
+        
+        // Initialize the page
+        renderQuestions();
+    </script>
+</body>
+</html>

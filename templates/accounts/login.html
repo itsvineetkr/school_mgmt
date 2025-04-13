@@ -1,0 +1,11 @@
+{% extends "accounts/form.html" %}
+
+{% block pageTitle %}Login{% endblock pageTitle %}
+{% block formTitle %}Login{% endblock formTitle %}
+
+{% block fields %}
+    <input type="email" name="email" placeholder="Your Email">
+    <input type="password" name="password" placeholder="Your Password">        
+    <button type="submit">Login</button>
+    <a href="">Forgot Password?</a>
+{% endblock fields %}

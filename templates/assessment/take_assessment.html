@@ -1,0 +1,539 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photosynthesis Assessment</title>
+    <link rel="stylesheet" href="{% static 'css/assessment/test-mode.css' %}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Photosynthesis Assessment</h1>
+            <div class="header-controls">
+                <div class="timer" id="timer">Time: 00:00:00</div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <form id="assessment-form">
+            {% csrf_token %}
+            <div class="progress-indicator" id="progress-indicator">
+                <!-- Progress dots will be added here -->
+            </div>
+            
+            <div id="questions-container">
+                <!-- Questions will be populated here -->
+            </div>
+            
+            <div class="navigation">
+                <button type="button" id="prev-btn" class="btn btn-secondary" disabled>Previous</button>
+                <button type="button" id="next-btn" class="btn btn-primary">Next</button>
+                <button type="button" id="submit-btn" class="btn btn-primary" style="display: none;">Submit Assessment</button>
+            </div>
+        </form>
+    </div>
+    
+    <div id="completion-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Submit Assessment?</h2>
+            <p>You're about to submit your assessment. Make sure you have answered all the questions to the best of your ability.</p>
+            
+            <div id="unanswered-summary" style="display: none;">
+                <h3 style="margin-top: 15px; color: var(--danger-color);">Unanswered Questions:</h3>
+                <div id="unanswered-list" class="summary-container">
+                    <!-- Unanswered questions will be listed here -->
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button id="cancel-submit" class="btn btn-secondary">Review Answers</button>
+                <button id="confirm-submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebarButtons = document.querySelectorAll('.sidebar-button')
+            const contentSections = document.querySelectorAll('.content-section')
+    
+            contentSections.forEach((section) => (section.style.display = 'none'))
+    
+            sidebarButtons.forEach((button) => {
+                button.addEventListener('click', function () {
+                    contentSections.forEach((section) => (section.style.display = 'none'))
+                    sidebarButtons.forEach((btn) => btn.classList.remove('active'))
+                    const targetClass = this.getAttribute('data-target')
+                    const targetSection = document.querySelector(`.${targetClass}`)
+                    if (targetSection) {
+                        targetSection.style.display = 'block'
+                    }
+                    this.classList.add('active')
+                })
+            })
+        })
+    
+        function getCsrfToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        }
+    
+        const handleResponse = (response) => {
+            console.log('Response:', response);
+            if (response.ok) {
+                return response.json().then((data) => {
+                    return data
+                })
+            }
+            return response.json().then((error) => {
+                throw new Error(error.message)
+            })
+        }
+        // Assessment data
+        const assessmentData = JSON.parse("{{ assessment.assessment|escapejs|safe }}");
+        const assessmentDuration = parseInt("{{ assessment.duration }}"); // Duration in minutes
+        const assessmentId = "{{ assessment.id }}"; // Unique identifier for this assessment
+        
+        console.log(assessmentData);
+
+
+        // Variables to track state
+        let currentQuestionIndex = 0;
+        let answers = new Array(assessmentData.length).fill(null);
+        let startTime;
+        let timerInterval;
+        let remainingTime; // remaining time in seconds
+
+        // Local Storage Keys
+        const storageKeyPrefix = `assessment_${assessmentId}_`;
+        const TIMER_KEY = `${storageKeyPrefix}timer`;
+        const ANSWERS_KEY = `${storageKeyPrefix}answers`;
+        const START_TIME_KEY = `${storageKeyPrefix}start_time`;
+
+        // DOM elements
+        const questionsContainer = document.getElementById('questions-container');
+        const progressIndicator = document.getElementById('progress-indicator');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const timerDisplay = document.getElementById('timer');
+        const completionModal = document.getElementById('completion-modal');
+        const cancelSubmitBtn = document.getElementById('cancel-submit');
+        const confirmSubmitBtn = document.getElementById('confirm-submit');
+        const assessmentForm = document.getElementById('assessment-form');
+        const unansweredSummary = document.getElementById('unanswered-summary');
+        const unansweredList = document.getElementById('unanswered-list');
+
+        // Initialize the assessment
+        function initializeAssessment() {
+            renderQuestions();
+            renderProgressIndicator();
+            loadSavedState();
+            showQuestion(currentQuestionIndex);
+            startTimer();
+            setupEventListeners();
+            // Add beforeunload event to save state when navigating away
+            window.addEventListener('beforeunload', saveCurrentState);
+        }
+
+        // Save current state to localStorage
+        function saveCurrentState() {
+            localStorage.setItem(TIMER_KEY, remainingTime.toString());
+            localStorage.setItem(ANSWERS_KEY, JSON.stringify(answers));
+            
+            // Save current timestamp if not already set
+            if (!localStorage.getItem(START_TIME_KEY)) {
+                localStorage.setItem(START_TIME_KEY, Date.now().toString());
+            }
+        }
+
+        // Load saved state from localStorage
+        function loadSavedState() {
+            // Check if we have saved answers
+            const savedAnswers = localStorage.getItem(ANSWERS_KEY);
+            if (savedAnswers) {
+                answers = JSON.parse(savedAnswers);
+                
+                // Mark saved answers in the UI
+                answers.forEach((answer, index) => {
+                    if (answer !== null) {
+                        if (assessmentData[index]['question-type'] === 'MCQ' && typeof answer === 'number') {
+                            const radioBtn = document.querySelector(`input[name="question-${index}"][value="${answer}"]`);
+                            if (radioBtn) radioBtn.checked = true;
+                        } else if (assessmentData[index]['question-type'] === 'Written') {
+                            const textarea = document.querySelector(`textarea[name="written-${index}"]`);
+                            if (textarea) textarea.value = answer;
+                        }
+                    }
+                });
+            }
+            
+            // Check if we have a saved timer
+            const savedTime = localStorage.getItem(TIMER_KEY);
+            if (savedTime) {
+                remainingTime = parseInt(savedTime);
+                
+                // If time has expired, submit immediately
+                if (remainingTime <= 0) {
+                    submitAssessment();
+                    return;
+                }
+            } else {
+                // No saved time, start with full duration
+                remainingTime = assessmentDuration * 60;
+            }
+            
+            // Check if we need to account for time that passed while away from the page
+            const savedStartTime = localStorage.getItem(START_TIME_KEY);
+            if (savedStartTime) {
+                const elapsedSinceStart = Math.floor((Date.now() - parseInt(savedStartTime)) / 1000);
+                const timeToReduce = Math.min(elapsedSinceStart, remainingTime);
+                remainingTime -= timeToReduce;
+                
+                // If time has expired, submit immediately
+                if (remainingTime <= 0) {
+                    submitAssessment();
+                    return;
+                }
+            }
+        }
+
+        // Render all questions
+        function renderQuestions() {
+            assessmentData.forEach((question, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = `question-card ${question['question-type'].toLowerCase()}-question`;
+                questionElement.id = `question-${index}`;
+                
+                let questionHTML = `
+                    <div class="question-header">
+                        <span>Question ${index + 1}</span>
+                        <span class="question-type">${question['question-type']}</span>
+                    </div>
+                    <div class="question-text">${question.question}</div>
+                `;
+                
+                if (question['question-type'] === 'MCQ') {
+                    questionHTML += `<ul class="options">`;
+                    question.options.forEach((option, optIndex) => {
+                        questionHTML += `
+                            <li class="option-item">
+                                <label class="option-label">
+                                    <input type="radio" name="question-${index}" value="${optIndex}" class="option-input" data-question="${index}">
+                                    ${String.fromCharCode(65 + optIndex)}. ${option}
+                                </label>
+                            </li>
+                        `;
+                    });
+                    questionHTML += `</ul>`;
+                } else if (question['question-type'] === 'Written') {
+                    questionHTML += `
+                        <div class="written-response">
+                            <textarea name="written-${index}" placeholder="Type your answer here..." data-question="${index}"></textarea>
+                        </div>
+                    `;
+                }
+                
+                questionElement.innerHTML = questionHTML;
+                questionsContainer.appendChild(questionElement);
+            });
+        }
+
+        // Render progress indicator
+        function renderProgressIndicator() {
+            assessmentData.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                dot.textContent = index + 1;
+                dot.dataset.index = index;
+                dot.addEventListener('click', () => navigateToQuestion(parseInt(index)));
+                progressIndicator.appendChild(dot);
+            });
+            updateProgressIndicator();
+        }
+
+        // Show a specific question
+        function showQuestion(index) {
+            // Hide all questions
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Show the current question
+            document.getElementById(`question-${index}`).classList.add('active');
+            
+            // Update current question index
+            currentQuestionIndex = index;
+            
+            // Update navigation buttons
+            updateNavigationButtons();
+            
+            // Update progress indicator
+            updateProgressIndicator();
+        }
+
+        // Update navigation buttons based on current question
+        function updateNavigationButtons() {
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === assessmentData.length - 1) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        // Update progress indicator
+        function updateProgressIndicator() {
+            const dots = document.querySelectorAll('.progress-dot');
+            
+            dots.forEach((dot, index) => {
+                dot.classList.remove('active', 'answered');
+                
+                if (index === currentQuestionIndex) {
+                    dot.classList.add('active');
+                }
+                
+                if (answers[index] !== null) {
+                    dot.classList.add('answered');
+                }
+            });
+        }
+
+        // Navigate to next question
+        function nextQuestion() {
+            if (currentQuestionIndex < assessmentData.length - 1) {
+                showQuestion(currentQuestionIndex + 1);
+            }
+        }
+
+        // Navigate to previous question
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                showQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        // Navigate to a specific question
+        function navigateToQuestion(index) {
+            if (index >= 0 && index < assessmentData.length) {
+                showQuestion(index);
+            }
+        }
+
+        // Start the timer with countdown
+        function startTimer() {
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                remainingTime--;
+                updateTimerDisplay();
+                
+                // Save state every minute
+                if (remainingTime % 60 === 0) {
+                    saveCurrentState();
+                }
+                
+                // If time runs out, automatically submit the assessment
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    submitAssessment();
+                }
+            }, 1000);
+        }
+
+        // Update the timer display for countdown
+        function updateTimerDisplay() {
+            const hours = Math.floor(remainingTime / 3600);
+            const minutes = Math.floor((remainingTime % 3600) / 60);
+            const seconds = remainingTime % 60;
+            
+            timerDisplay.textContent = `Time: ${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`;
+            
+            // Change color when time is running low (less than 5 minutes)
+            if (remainingTime <= 300) {
+                timerDisplay.style.backgroundColor = 'var(--danger-color)';
+            }
+        }
+
+        // Format time to have leading zeros
+        function formatTime(time) {
+            return time < 10 ? `0${time}` : time;
+        }
+
+        // Save answer for the current question
+        function saveAnswer(questionIndex, value) {
+            answers[questionIndex] = value;
+            updateProgressIndicator();
+            saveCurrentState(); // Save to localStorage when answer changes
+        }
+
+        // Check for unanswered questions
+        function checkUnansweredQuestions() {
+            const unanswered = [];
+            
+            answers.forEach((answer, index) => {
+                if (answer === null || answer === '') {
+                    unanswered.push({
+                        index: index,
+                        question: `Question ${index + 1}: ${assessmentData[index].question.substring(0, 50)}${assessmentData[index].question.length > 50 ? '...' : ''}`
+                    });
+                }
+            });
+            
+            return unanswered;
+        }
+
+        // Show completion modal
+        function showCompletionModal() {
+            const unanswered = checkUnansweredQuestions();
+            
+            if (unanswered.length > 0) {
+                unansweredSummary.style.display = 'block';
+                unansweredList.innerHTML = '';
+                
+                unanswered.forEach(item => {
+                    const listItem = document.createElement('div');
+                    listItem.className = 'summary-item';
+                    listItem.innerHTML = `
+                        <span>${item.question}</span>
+                        <button type="button" class="btn btn-secondary goto-question" data-index="${item.index}">Go to</button>
+                    `;
+                    unansweredList.appendChild(listItem);
+                });
+                
+                // Add event listeners to "Go to" buttons
+                document.querySelectorAll('.goto-question').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const index = parseInt(btn.dataset.index);
+                        completionModal.style.display = 'none';
+                        navigateToQuestion(index);
+                    });
+                });
+            } else {
+                unansweredSummary.style.display = 'none';
+            }
+            
+            completionModal.style.display = 'flex';
+        }
+
+        // Create the JSON submission data
+        function createSubmissionData() {
+            const submissionData = assessmentData.map((question, index) => {
+                const submissionQuestion = {
+                    "question-type": question["question-type"],
+                    "question": question.question
+                };
+                
+                if (question["question-type"] === "MCQ") {
+                    submissionQuestion.options = [...question.options];
+                    submissionQuestion.answer = answers[index] !== null ? answers[index] : null;
+                } else if (question["question-type"] === "Written") {
+                    submissionQuestion.answer = answers[index] || "";
+                }
+                
+                return submissionQuestion;
+            });
+            
+            return submissionData;
+        }
+
+        // Clear assessment data from localStorage
+        function clearAssessmentData() {
+            localStorage.removeItem(TIMER_KEY);
+            localStorage.removeItem(ANSWERS_KEY);
+            localStorage.removeItem(START_TIME_KEY);
+        }
+
+        // Submit assessment
+        function submitAssessment() {
+            // Stop the timer
+            clearInterval(timerInterval);
+            
+            // Create the submission JSON data
+            const submissionData = createSubmissionData();
+            console.log('Submission Data:', JSON.stringify(submissionData));
+            
+            fetch('/assessment/api/submit_assessment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    assessment_id: assessmentId,
+                    assessment: submissionData,
+                })
+            })
+            .then(handleResponse)
+            .then(data => {
+                const response = data.response;
+            })
+            .catch(error => {
+                console.error('Error submitting assessment:', error);
+            });
+
+
+            // Clear stored data as we're done with the assessment
+            clearAssessmentData();
+            
+            // Redirect to dashboard
+            window.location.href = "/schools/dashboard";
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // MCQ option selection
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const questionIndex = parseInt(this.dataset.question);
+                    saveAnswer(questionIndex, parseInt(this.value));
+                });
+            });
+            
+            // Written answer input
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    const questionIndex = parseInt(this.dataset.question);
+                    saveAnswer(questionIndex, this.value.trim());
+                });
+                
+                // Also save on blur
+                textarea.addEventListener('blur', function() {
+                    const questionIndex = parseInt(this.dataset.question);
+                    saveAnswer(questionIndex, this.value.trim());
+                });
+            });
+            
+            // Navigation buttons
+            prevBtn.addEventListener('click', previousQuestion);
+            nextBtn.addEventListener('click', nextQuestion);
+            submitBtn.addEventListener('click', showCompletionModal);
+            
+            // Modal buttons
+            cancelSubmitBtn.addEventListener('click', () => {
+                completionModal.style.display = 'none';
+            });
+            
+            confirmSubmitBtn.addEventListener('click', submitAssessment);
+            
+            // Form submission
+            assessmentForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                submitAssessment();
+            });
+        }
+
+        // Add unload event listener to save state when tab/browser is closed
+        window.addEventListener('unload', saveCurrentState);
+
+        // Initialize when the page loads
+        window.addEventListener('DOMContentLoaded', initializeAssessment);
+    </script>
+</body>
+</html>
