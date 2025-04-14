@@ -6,6 +6,7 @@ from schools.constants import (
     FEE_STATUS_CHOICES,
 )
 from django.utils import timezone
+from datetime import timedelta
 
 
 class RegisteredSchool(models.Model):
@@ -77,3 +78,12 @@ class FeeStatus(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.due_date} - {self.status}"
+
+
+class UserOTP(models.Model):
+    email = models.EmailField()
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_valid(self):
+        return timezone.now() < self.created_at + timedelta(minutes=10)

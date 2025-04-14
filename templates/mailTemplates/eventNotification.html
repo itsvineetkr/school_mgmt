@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upcoming Event Notification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f7f7;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+    .header {
+      background-color: #673ab7;
+      padding: 20px;
+      color: white;
+      text-align: center;
+    }
+    .content {
+      padding: 20px;
+    }
+    .event-banner {
+      width: 100%;
+      height: 200px;
+      background-color: #e1e1e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .event-details {
+      background-color: #f7f7f7;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    .event-date {
+      color: #673ab7;
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .event-location {
+      margin-bottom: 10px;
+    }
+    .button {
+      display: inline-block;
+      background-color: #673ab7;
+      color: white;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+    .footer {
+      background-color: #f1f1f1;
+      padding: 15px;
+      text-align: center;
+      font-size: 12px;
+      color: #666666;
+    }
+    .detail-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    .detail-label {
+      font-weight: bold;
+      width: 100px;
+    }
+    @media only screen and (max-width: 480px) {
+      .container {
+        width: 100% !important;
+      }
+      .event-banner {
+        height: 150px;
+      }
+      .detail-row {
+        flex-direction: column;
+      }
+      .detail-label {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      .button {
+        display: block;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Upcoming Event</h1>
+    </div>
+    <div class="content">
+      <h2>{{ eventName }}</h2>
+      
+      <div class="event-details">
+        <div class="event-date">
+          {{ date | date: 'fullDate' }}
+        </div>
+        <div class="event-location">
+          <strong>Location:</strong> {{ venue }}
+        </div>
+      </div>
+      
+      <h3>Event Description</h3>
+      <p>{{ description }}</p>
+    
+      
+      <a href="#" class="button">RSVP Now</a>
+      
+      <p style="margin-top: 20px;">We look forward to seeing you there!</p>
+      
+      <p>Best regards</p>
+    </div>
+    <div class="footer">
+      <p>If you have any questions about this event, please contact us at the intitute.</p>
+      <p>&copy; 2025 All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

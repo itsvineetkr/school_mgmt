@@ -138,3 +138,25 @@ AUTHENTICATION_BACKENDS = [
     "accounts.backends.EmailBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "vineetkumarvks.8866@gmail.com"
+EMAIL_HOST_PASSWORD = ""
+
+# EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+# EMAIL_HOST_USER = ""
+# SENDGRID_API_KEY = 'YOUR_SENDGRID_API_KEY'
+
+# # Toggle sandbox mode (when using sandbox mode, emails won't be delivered)
+# SENDGRID_SANDBOX_MODE_IN_DEBUG = True  # Set to False in production
+
+# # Echo to stdout or stderr
+# SENDGRID_ECHO_TO_STDOUT = True
+
+# # Optional settings for tracking
+# SENDGRID_TRACK_EMAIL_OPENS = True
+# SENDGRID_TRACK_CLICKS_HTML = True
+# SENDGRID_TRACK_CLICKS_PLAIN = True

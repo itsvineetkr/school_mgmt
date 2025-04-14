@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assessment Results</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f7f7;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+    .header {
+      background-color: #4a86e8;
+      padding: 20px;
+      color: white;
+      text-align: center;
+    }
+    .content {
+      padding: 20px;
+    }
+    .assessment-info {
+      background-color: #f7f7f7;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    .score {
+      font-size: 24px;
+      font-weight: bold;
+      color: #4a86e8;
+      text-align: center;
+      padding: 15px;
+      border: 2px solid #4a86e8;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    .remarks {
+      background-color: #f7f7f7;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
+    .footer {
+      background-color: #f1f1f1;
+      padding: 15px;
+      text-align: center;
+      font-size: 12px;
+      color: #666666;
+    }
+    .detail-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    .detail-label {
+      font-weight: bold;
+      width: 120px;
+    }
+    @media only screen and (max-width: 480px) {
+      .container {
+        width: 100% !important;
+      }
+      .detail-row {
+        flex-direction: column;
+      }
+      .detail-label {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Assessment Results</h1>
+    </div>
+    <div class="content">
+      <p>Dear {{studentName}},</p>
+      <p>Your recent assessment has been graded. Here are your results:</p>
+      
+      <div class="assessment-info">
+        <div class="detail-row">
+          <div class="detail-label">Assessment:</div>
+          <div>{{assessmentName}}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Subject:</div>
+          <div>{{assessmentSubject}}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Teacher:</div>
+          <div>{{teacher}}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Submission Date:</div>
+          <div>{{submissionDate}}</div>
+        </div>
+      </div>
+      
+      <div class="score">
+        {{marksObtained}} / {{totalMarks}}
+      </div>
+      
+      <div class="remarks">
+        <h3>Teacher's Remarks</h3>
+        <p>{{remarks}}</p>
+      </div>
+      
+      <p>Keep up the good work! If you have any questions about your assessment, please contact your teacher.</p>
+      
+      <p>Best regards</p>
+    </div>
+    <div class="footer">
+      <p>This is an automated email. Please do not reply to this message.</p>
+      <p>&copy; 2025 All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
