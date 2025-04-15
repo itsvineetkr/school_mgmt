@@ -1,4 +1,9 @@
 /* Main container wrapper */
+
+html {
+  scroll-behavior: smooth;
+}
+
 .up-profile-page-wrapper {
   width: 100%;
   max-width: 1200px;

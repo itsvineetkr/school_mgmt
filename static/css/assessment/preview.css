@@ -1,12 +1,12 @@
 :root {
-    --primary-color:rgb(109, 109, 109);
-    --accent-color:rgb(149, 149, 150);
+    --primary-color: rgb(109, 109, 109);
+    --accent-color: rgb(149, 149, 150);
     --border-color: #595959;
-    --text-color:rgb(255, 255, 255);
+    --text-color: rgb(255, 255, 255);
     --light-text: #91a2bc;
 }
 
-.assessment-info{
+.assessment-info {
     padding: 20px;
     font-weight: 200;
     border-radius: 10px;
@@ -14,18 +14,22 @@
     margin: 20px 0px;
 }
 
-.assessment-info h1{
+html {
+    scroll-behavior: smooth;
+}
+
+.assessment-info h1 {
     font-size: 2rem;
     font-weight: normal;
 }
 
-.assessment-container h2{
+.assessment-container h2 {
     font-size: 1.5rem;
     font-weight: 500;
     margin-bottom: 20px;
 }
 
-.question-container{
+.question-container {
     line-height: 1.6;
 }
 
@@ -34,7 +38,7 @@
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .question-header {
@@ -115,11 +119,11 @@
     .assessment-container {
         padding: 15px;
     }
-    
+
     h1 {
         font-size: 1.5rem;
     }
-    
+
     .question-card {
         padding: 15px;
     }

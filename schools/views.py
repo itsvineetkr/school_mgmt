@@ -28,9 +28,7 @@ def dashboard(request):
             context["school"] = None
         return render(request, "schools/dash-principal.html", context)
     if request.user.role == "teacher":
-        context = {
-            "user": request.user,
-        }
+        context = {}
         standards = [
             (standard.standard, standard.section)
             for standard in ClassAssessment.objects.filter(account=request.user)
@@ -43,9 +41,9 @@ def dashboard(request):
         user = request.user
         try:
             school = AccountAffiliation.objects.get(account=request.user).school
-            context["school"] = school
         except AccountAffiliation.DoesNotExist:
-            context["school"] = None
+            school = None
+
         context = {
             "unique_standards": sorted(unique_standards),
             "standards": standards,
@@ -66,6 +64,95 @@ def dashboard(request):
         except ClassAssessment.DoesNotExist:
             context = {"error": "Student not found"}
         return render(request, "schools/dash-student.html", context=context)
+
+    if request.user.role == "admin":
+        context = {}
+
+        # Get all principals and their schools for admin dashboard
+        affiliations = AccountAffiliation.objects.filter(account__role="principal")
+        principals_and_schools = []
+        for affiliation in affiliations:
+            principals_and_schools.append(
+                {
+                    "school_name": affiliation.school.schoolName,
+                    "unique_code": affiliation.school.uniqueSchoolCode,
+                    "principal_name": affiliation.account.username,
+                    "email": affiliation.account.email,
+                    "phone": affiliation.account.phoneno,
+                }
+            )
+        context["schools"] = principals_and_schools
+
+        if request.method == "POST":
+            data = request.POST
+            action = data.get("action")
+            if action == "add":
+                if "logo" in request.FILES:
+                    logo = request.FILES["logo"]
+                else:
+                    logo = None
+
+                principal_data = {
+                    "name": data.get("name"),
+                    "email": data.get("email"),
+                    "phoneno": data.get("phone"),
+                    "gender": data.get("gender"),
+                    "dob": data.get("dob"),
+                    "password": data.get("password"),
+                }
+
+                school_data = {
+                    "unique_code": data.get("schoolUniqueCode"),
+                    "name": data.get("schoolName"),
+                    "address": data.get("address"),
+                    "logo": logo,
+                }
+
+                # Create principal account
+                principalAccount = CustomUser(
+                    email=principal_data["email"],
+                    username=principal_data["name"],
+                    phoneno=principal_data["phoneno"],
+                    role="principal",
+                    gender=principal_data["gender"],
+                    dob=principal_data["dob"],
+                )
+                principalAccount.set_password(principal_data["password"])
+                principalAccount.save()
+
+                # Create school
+                school = RegisteredSchool(
+                    unique_code=school_data["unique_code"],
+                    name=school_data["name"],
+                    address=school_data["address"],
+                    logo=school_data["logo"],
+                )
+                school.save()
+
+                # Link principal to school
+                AccountAffiliation(school=school, account=principalAccount).save()
+
+            if action == "remove":
+                school_unique_code = data.get("schoolUniqueCode")
+                email = data.get("email")
+
+                try:
+                    school = RegisteredSchool.objects.get(
+                        unique_code=school_unique_code
+                    )
+                    principal = CustomUser.objects.get(email=email, role="principal")
+                    AccountAffiliation.objects.get(
+                        school=school, account=principal
+                    ).delete()
+                    principal.delete()
+                    school.delete()
+                except (
+                    RegisteredSchool.DoesNotExist,
+                    CustomUser.DoesNotExist,
+                    AccountAffiliation.DoesNotExist,
+                ):
+                    pass
+        return render(request, "schools/dash-admin.html", context)
 
 
 @api_view(["POST"])

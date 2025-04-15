@@ -15,6 +15,10 @@ body {
     font-family: "Balsamiq Sans", serif;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 .home {
     background-color: #ffd700;
     height: 70vh;
@@ -177,11 +181,12 @@ nav .nav-button {
 }
 
 @media (max-width: 768px) {
-    .home{
+    .home {
         width: 100vw;
         height: 100vh;
         margin: 0 0 -10px 0;
     }
+
     .home .container {
         display: flex;
         align-items: center;
@@ -190,13 +195,13 @@ nav .nav-button {
         height: 80vh;
         width: 100vw;
     }
-    
+
     .home .container .image img {
         width: 300px;
         max-width: 80vw;
         padding-top: 50px;
     }
-    
+
     .home .content {
         display: flex;
         flex-direction: column;
@@ -205,19 +210,19 @@ nav .nav-button {
         width: 700px;
         max-width: 85vw;
     }
-    
+
     .home .content .title {
         font-size: 50px;
         color: #323232;
         margin-bottom: 20px;
     }
-    
+
     .home .content .description {
         font-size: 20px;
         color: #424242;
         margin-bottom: 50px;
     }
-    
+
     .home .content .buttons a {
         padding: 10px 20px;
         margin: 0 20px 0 0;
@@ -227,13 +232,13 @@ nav .nav-button {
         border-radius: 8px;
         border: 1px solid #2a2a2a;
     }
-    
+
     .home .content .buttons a:hover {
         background-color: #2a2a2a;
         color: #ffffff;
         transition: 0.2s ease;
     }
-    
+
 
 }
 
@@ -267,7 +272,7 @@ nav .nav-button {
 }
 
 @media (max-width: 768px) {
-    
+
     .about .container {
         padding: 30px 0 0 0;
         display: flex;
@@ -277,37 +282,38 @@ nav .nav-button {
         height: 100%;
     }
 
-    #container2{
+    #container2 {
         flex-direction: column-reverse;
         padding: 80px 0 40px 0;
     }
-    
+
     .about .container .title,
     .about .container .description {
         max-width: 700px;
         width: 85vw;
     }
-    
+
     .about .container .title {
         font-size: 30px;
         color: #323232;
         margin-bottom: 20px;
     }
-    
+
     .about .container .description {
         font-size: 18px;
         color: #424242;
         margin-bottom: 50px;
         backdrop-filter: blur(10px);
     }
-    
+
     .about .container img {
         width: 300px;
         max-width: 80vw;
         margin: -150px 0 0 0;
     }
 
-    #about-img-1, #about-img-2{
+    #about-img-1,
+    #about-img-2 {
         z-index: -100;
     }
 }
@@ -376,7 +382,7 @@ nav .nav-button {
     width: 80%;
 }
 
-@media (max-width: 768px){
+@media (max-width: 768px) {
     .features .container {
         display: flex;
         flex-direction: column;
@@ -390,7 +396,7 @@ nav .nav-button {
         margin: 40px 0 20px 0;
 
     }
-    
+
     .features .main-description {
         font-size: 16px;
         color: #424242;
@@ -398,14 +404,14 @@ nav .nav-button {
         max-width: 80vw;
         text-align: center;
     }
-    
+
 }
 
-.footer-svg{
+.footer-svg {
     background-color: #202020;
 }
 
-footer{
+footer {
     background-color: #202020;
     margin: -20px 0 0 0;
     color: #ffffff;
@@ -416,19 +422,19 @@ footer{
     justify-content: center;
 }
 
-.contact{
+.contact {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.contact-title{
+.contact-title {
     font-size: 40px;
     color: #ffffffdd;
     padding: 0 50px 0 0;
 }
 
-.contact form{
+.contact form {
     height: 50px;
     max-width: 500px;
     display: flex;
@@ -439,7 +445,7 @@ footer{
     padding: 4px;
 }
 
-.contact form input{
+.contact form input {
     height: 100%;
     width: 100%;
     padding: 0 20px;
@@ -450,7 +456,7 @@ footer{
     font-family: "Balsamiq Sans", serif;
 }
 
-.contact form button{
+.contact form button {
     height: 100%;
     padding: 0 20px;
     border: none;
@@ -461,98 +467,98 @@ footer{
     font-family: "Balsamiq Sans", serif;
 }
 
-.footer-title{
+.footer-title {
     font-size: 70px;
     margin: 100px 0 30px 0;
 }
 
-.footer-links a{
+.footer-links a {
     text-decoration: none;
     color: #adadad;
     font-size: 20px;
     margin: 0px 20px;
 }
 
-.footer-links a:hover{
+.footer-links a:hover {
     color: #ffffff;
 }
 
-.social-media{
+.social-media {
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 40px 0;
 }
 
-.social-media a{
+.social-media a {
     text-decoration: none;
     color: #ffffff8d;
     font-size: 30px;
     margin: 0 20px;
 }
 
-.social-media a:hover{
+.social-media a:hover {
     color: #ffffff;
 }
 
-.copyright{
+.copyright {
     font-size: 12px;
     color: #ffffff6c;
     margin: 20px 0;
 }
 
-@media (max-width: 768px){
-    
-    .contact{
+@media (max-width: 768px) {
+
+    .contact {
         flex-direction: column;
         padding-top: 50px;
     }
-    
-    .contact-title{
+
+    .contact-title {
         font-size: 30px;
         color: #ffffffdd;
         padding: 0 0 20px 0;
     }
-    
-    .contact form{
+
+    .contact form {
         max-width: 85vw;
     }
-    
-    .footer-title{
+
+    .footer-title {
         font-size: 40px;
         margin: 70px 0 30px 0;
     }
-    
-    .footer-links a{
+
+    .footer-links a {
         text-decoration: none;
         color: #adadad;
         font-size: 16px;
         margin: 0px 14px;
     }
-    
-    .footer-links a:hover{
+
+    .footer-links a:hover {
         color: #ffffff;
     }
-    
-    .social-media{
+
+    .social-media {
         display: flex;
         justify-content: center;
         align-items: center;
         margin: 40px 0;
     }
-    
-    .social-media a{
+
+    .social-media a {
         text-decoration: none;
         color: #ffffff8d;
         font-size: 30px;
         margin: 0 20px;
     }
-    
-    .social-media a:hover{
+
+    .social-media a:hover {
         color: #ffffff;
     }
-    
-    .copyright{
+
+    .copyright {
         font-size: 12px;
         color: #ffffff6c;
         margin: 20px 0;

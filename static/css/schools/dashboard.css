@@ -6,23 +6,23 @@
     box-sizing: border-box;
 }
 
-body{
+body {
     font-family: "Poppins", serif;
     color: white;
     background-color: rgb(24, 26, 27);
 }
 
-body a{
+body a {
     color: white;
 }
 
-.container{
+.container {
     display: flex;
     width: 100vw;
     /* height: 100vh; */
 }
 
-.sidebar{
+.sidebar {
     /* height: 100vh; */
     width: 250px;
     background-color: rgb(24, 26, 27);
@@ -34,17 +34,17 @@ body a{
     padding-bottom: 30px;
 }
 
-.sidebar .title{
+.sidebar .title {
     padding: 20px 0px 20px 0px;
 }
 
-.sidebar .title a{
+.sidebar .title a {
     text-decoration: none;
     color: white;
     font-size: 28px;
 }
 
-.sidebar .sidebar-button{
+.sidebar .sidebar-button {
     text-decoration: none;
     padding: 10px 20px;
     width: 210px;
@@ -65,14 +65,14 @@ body a{
     color: white;
 }
 
-.wrapper{
+.wrapper {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-.navbar{
+.navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -81,7 +81,7 @@ body a{
     height: 70px;
 }
 
-.navbar button{
+.navbar button {
     background-color: rgb(30, 32, 33);
     /* background-color: rgb(245, 245, 245); */
     border: none;
@@ -94,11 +94,11 @@ body a{
     transition: background-color 0.3s ease;
 }
 
-.navbar .nav-button{
+.navbar .nav-button {
     padding: 30px;
 }
 
-.content{
+.content {
     flex: 1;
     background-color: rgb(30, 32, 33);
     /* background-color: rgb(245, 245, 245); */
@@ -107,7 +107,7 @@ body a{
     border-radius: 30px 0 0 30px;
 }
 
-.content .notice{
+.content .notice {
     height: 400px;
     flex: 2;
     background-color: rgb(24, 26, 27);
@@ -116,7 +116,7 @@ body a{
     border-radius: 12px;
 }
 
-.content .data-visual{
+.content .data-visual {
     height: 400px;
     flex: 3;
     background-color: rgb(24, 26, 27);
@@ -125,16 +125,16 @@ body a{
     border-radius: 12px;
 }
 
-.nav-button{
+.nav-button {
     visibility: hidden;
 }
 
-@media (max-width: 768px){
-    .nav-button{
+@media (max-width: 768px) {
+    .nav-button {
         visibility: visible;
     }
 
-    .sidebar{
+    .sidebar {
         position: fixed;
         top: 0;
         left: -100%;
@@ -148,24 +148,24 @@ body a{
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    .content{
+    .content {
         flex-direction: column;
         border-radius: 0px;
     }
 
-    .content .notice{
+    .content .notice {
         flex: 1;
         margin: 20px;
     }
 
-    .content .data-visual{
+    .content .data-visual {
         flex: 1;
         margin: 0 20px 20px 20px;
     }
 
 }
 
-.content > div{
+.content>div {
     display: none;
 }
 
@@ -189,7 +189,7 @@ body a{
     text-align: center;
 }
 
-.content-section form{
+.content-section form {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -229,7 +229,7 @@ body a{
     outline: none;
 }
 
-.content-section textarea{
+.content-section textarea {
     width: 400px;
     max-width: 90vw;
     padding: 7px 12px;
@@ -260,7 +260,7 @@ body a{
     cursor: pointer;
 }
 
-.content-section .input-radio{
+.content-section .input-radio {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -291,7 +291,7 @@ body a{
 }
 
 
-.content-section .input-date{
+.content-section .input-date {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -307,13 +307,15 @@ body a{
     color: #fff;
     font-size: 12px;
 }
+
 .content-section .input-date label {
     font-family: "Poppins", serif;
     font-size: 14px;
     margin-right: 20px;
     color: #fff;
-    text-wrap:nowrap;
+    text-wrap: nowrap;
 }
+
 .content-section .input-date input[type="date"] {
     margin: 0 0 0 0;
     border: none;
@@ -371,11 +373,12 @@ body a{
     font-size: 12px;
 }
 
-.section-fee-status-check .students-list td:nth-child(4), .section-fee-status-check .students-list td:nth-child(5){
+.section-fee-status-check .students-list td:nth-child(4),
+.section-fee-status-check .students-list td:nth-child(5) {
     min-width: 120px;
 }
 
-.section-fee-status-check .students-list td:nth-child(1){
+.section-fee-status-check .students-list td:nth-child(1) {
     min-width: 150px;
 }
 
@@ -383,16 +386,18 @@ body a{
     font-size: 12px;
 }
 
-.section-fee-status .students-list td:nth-child(4), .section-fee-status .students-list td:nth-child(5){
+.section-fee-status .students-list td:nth-child(4),
+.section-fee-status .students-list td:nth-child(5) {
     min-width: 120px;
 }
 
-.section-fee-status .students-list td:nth-child(1){
+.section-fee-status .students-list td:nth-child(1) {
     min-width: 150px;
 }
 
 
 @media (max-width: 650px) {
+
     .students-list table,
     .students-list th,
     .students-list td {
@@ -401,30 +406,31 @@ body a{
 }
 
 @media (max-width: 550px) {
+
     /* Hide table header */
     .attendance-table thead {
         display: none;
     }
-    
+
     /* Make table elements block to stack rows */
-    .attendance-table, 
-    .attendance-table tbody, 
-    .attendance-table tr, 
+    .attendance-table,
+    .attendance-table tbody,
+    .attendance-table tr,
     .attendance-table td {
         display: block;
         width: 100%;
     }
-    
+
     .attendance-table tr {
         margin-bottom: 15px;
     }
-    
+
     .attendance-table td {
         /* Adjust padding to make room for data labels */
         text-align: center;
         position: relative;
     }
-    
+
     .attendance-table td::before {
         position: absolute;
         left: 10px;
@@ -434,13 +440,13 @@ body a{
         /* Default to the original data-label if not overridden */
         content: attr(data-label);
     }
-    
+
     /* Explicit labels for the radio buttons using nth-child selectors */
     .attendance-table td:nth-child(4)::before {
         text-align: left;
         content: "Present:";
     }
-    
+
     .attendance-table td:nth-child(3)::before {
         text-align: left;
         content: "Absent:";
@@ -457,7 +463,7 @@ body a{
 }
 
 
-#preview-assessment{
+#preview-assessment {
     margin: 20px 0;
 }
 
@@ -468,11 +474,12 @@ body a{
     max-width: 100%;
     height: 100%;
     padding: 20px;
-    
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    align-items: center;;
+    align-items: center;
+    ;
 }
 
 .see-assessment-container .assessment-card button {
@@ -480,7 +487,7 @@ body a{
     margin-top: 10px;
 }
 
-#preview-assessment h1{
+#preview-assessment h1 {
     padding: 30px 10px;
     font-weight: 500;
 }
@@ -531,7 +538,7 @@ body a{
         grid-template-columns: 1fr 1fr;
         padding: 15px;
     }
-    
+
     .see-assessment-container .assessment-card {
         width: 100%;
         max-width: 300px;
@@ -543,14 +550,14 @@ body a{
         grid-template-columns: 1fr;
         padding: 15px;
     }
-    
+
     .see-assessment-container .assessment-card {
         width: 100%;
         max-width: 300px;
     }
 }
 
-.assessment-result{
+.assessment-result {
     width: 400px;
     max-width: 90vw;
     padding: 20px;
@@ -569,12 +576,13 @@ body a{
 }
 
 
-.assessment-result h1{
+.assessment-result h1 {
     font-size: 20px;
     width: 100%;
     text-align: left;
 }
-.assessment-result p{
+
+.assessment-result p {
     font-size: 16px;
     width: 100%;
     text-align: left;
@@ -582,17 +590,17 @@ body a{
 }
 
 
-.assessment-result span{
+.assessment-result span {
     color: white;
 }
 
-.assessment-result .close-button{
+.assessment-result .close-button {
     margin: 20px 0px 0px 0px;
     width: 90%;
     background-color: rgb(212, 85, 85);
 }
 
-.assessment-result .close-button:hover{
+.assessment-result .close-button:hover {
     background-color: rgb(224, 71, 71);
     cursor: pointer;
 }
@@ -601,4 +609,48 @@ body a{
     color: rgb(224, 71, 71);
     margin: 20px 0px 0px 0px;
     font-size: 16px;
+}
+
+.schoolsTableAdmin {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: rgb(30, 32, 33);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.schoolsTableAdmin th,
+.schoolsTableAdmin td {
+    border: 1px solid rgb(55, 58, 60);
+    padding: 12px;
+    text-align: left;
+}
+
+.schoolsTableAdmin th {
+    background-color: rgb(55, 58, 60);
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.schoolsTableAdmin td {
+    background-color: rgb(30, 32, 33);
+    color: #fff;
+    font-size: 13px;
+}
+
+.schoolsTableAdmin tr:nth-child(even) td {
+    background-color: rgb(24, 26, 27);
+}
+
+.schoolsTableAdmin tr:hover td {
+    background-color: rgb(45, 45, 45);
+}
+
+@media (max-width: 768px) {
+    .schoolsTableAdmin {
+        display: block;
+        overflow-x: auto;
+    }
 }

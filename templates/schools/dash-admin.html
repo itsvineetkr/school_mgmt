@@ -1,0 +1,107 @@
+{% extends 'schools/base.html' %}
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/assessment/preview.css' %}">
+{% endblock style %}
+
+
+
+{% block sidebarButtons %}
+<div class="sidebar-button" data-target="section-add-principal">Add Institute/School</div>
+<div class="sidebar-button" data-target="section-remove-principal">Remove Institute/School</div>
+<div class="sidebar-button" data-target="section-see-principal">See Registered Institutes/Schools</div>
+{% endblock %}
+
+{% block content %}
+<div class="content-section section-add-principal">
+	<div class="content-section-title">Add Institute/School</div>
+	<form method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		<input type="hidden" name="action" value="add" />
+		<input type="text" name="name" placeholder="Name" required />
+		<input type="email" name="email" placeholder="Email" required />
+		<input type="text" name="phone" placeholder="Phone" required />
+		<div class="input-radio">
+			<label>Gender:</label>
+			Male<input type="radio" name="gender" value="m" />Female<input type="radio" name="gender"
+				value="f" />Other<input type="radio" name="gender" value="o" />
+		</div>
+		<div class="input-date">
+			<label>Date of Birth:</label>
+			<input type="date" name="dob" required />
+		</div>
+		<input type="password" name="password" placeholder="Password" required />
+	
+		<input type="file" name="logo" id="">
+		<input type="text" name="schoolUniqueCode" placeholder="School/Institute Unique Code" required />
+		<input type="text" name="schoolName" placeholder="School/Institute Name" required />
+		<input type="text" name="address" placeholder="School/Institute Address" required />
+
+		<button type="submit">Submit</button>
+	</form>
+</div>
+
+<div class="content-section section-remove-principal">
+	<div class="content-section-title">Remove Institute/School</div>
+	<form method="post">
+		{% csrf_token %}
+		<input type="hidden" name="action" value="remove" />
+		<input type="email" name="email" placeholder="Email" />
+		<input type="text" name="schoolUniqueCode" placeholder="School/Institute Unique Code" />
+		<button type="submit">Remove</button>
+	</form>
+</div>
+
+<div class="content-section section-see-principal">
+	<div class="content-section-title">See Institutes/Schools</div>
+	<table class="schoolsTableAdmin">
+		<thead>
+			<tr>
+				<th>School/Institute Name</th>
+				<th>Unique Code</th>
+				<th>Principal/Head Name</th>
+				<th>Email</th>
+				<th>Phone</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for school in schools %}
+			<tr>
+				<td>{{ school.school_name }}</td>
+				<td>{{ school.unique_code }}</td>
+				<td>{{ school.principal_name }}</td>
+				<td>{{ school.email }}</td>
+				<td>{{ school.phone }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const sidebarButtons = document.querySelectorAll('.sidebar-button')
+		const contentSections = document.querySelectorAll('.content-section')
+
+		contentSections.forEach((section) => (section.style.display = 'none'))
+
+		sidebarButtons.forEach((button) => {
+			button.addEventListener('click', function () {
+				contentSections.forEach((section) => (section.style.display = 'none'))
+				sidebarButtons.forEach((btn) => btn.classList.remove('active'))
+				const targetClass = this.getAttribute('data-target')
+				const targetSection = document.querySelector(`.${targetClass}`)
+				if (targetSection) {
+					targetSection.style.display = 'block'
+				}
+				this.classList.add('active')
+			})
+		})
+	})
+
+	document.querySelector(".profile-toggle").style.display = "none";
+</script>
+{% endblock %}
