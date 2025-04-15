@@ -16,8 +16,7 @@ def create_default_password(name: str, dob: str) -> str:
     year_part = dob.split("-")[0]
     default_password = f"{name_part}{year_part}"
 
-    # return default_password
-    return "password"
+    return default_password
 
 
 def send_otp_email(email, otp, name):

@@ -1,3 +1,1 @@
-forgot password
 attendance summary ki api and frontend
-missed assessment me view assessment ki btn
