@@ -28,6 +28,9 @@ def dashboard(request):
             context["school"] = None
         return render(request, "schools/dash-principal.html", context)
     if request.user.role == "teacher":
+        context = {
+            "user": request.user,
+        }
         standards = [
             (standard.standard, standard.section)
             for standard in ClassAssessment.objects.filter(account=request.user)
