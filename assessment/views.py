@@ -98,6 +98,20 @@ def save_assessment(request):
     assessment = data.get("assessment")
     due_date_str = data.get("due_date")
     duration = data.get("duration")
+    competition = data.get("competition", "SCHOOL")
+    if competition not in [
+        "SCHOOL",
+        "CUET",
+        "JEE_MAINS",
+        "JEE_ADVANCE",
+        "NEET",
+        "NDA",
+        "CLAT",
+        "OLYMPIAD",
+    ]:
+        return Response(
+            {"error": "Invalid competition value."}, status=status.HTTP_400_BAD_REQUEST
+        )
 
     try:
         school = AccountAffiliation.objects.get(account=request.user).school
@@ -127,6 +141,7 @@ def save_assessment(request):
             school=school,
             duration=duration,
             teacher=request.user,
+            competition=competition,
         )
         return Response(
             {
@@ -219,6 +234,7 @@ def get_assessments(request):
                             "max_score": submission.max_score,
                             "obtained_score": submission.obtained_score,
                             "remark": submission.remark,
+                            "competition": assessment.competition,
                         }
                     )
                     break
@@ -242,6 +258,7 @@ def get_assessments(request):
                         "max_score": None,
                         "obtained_score": None,
                         "remark": None,
+                        "competition": assessment.competition,
                     }
                 )
 
