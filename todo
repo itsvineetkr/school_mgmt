@@ -1,2 +1,4 @@
-principal --> see all teachers --> see all students
-competition wala
+principal --> see all teachers --> see all students --> see all assessments
+teachers --> see assessment result
+add email integration
+cron ki mkc, principal ko option do ki send monthly attendance mail

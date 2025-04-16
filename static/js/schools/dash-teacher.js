@@ -537,6 +537,95 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 })
 
 
+document.querySelector('.sb-see-assessment').addEventListener("click", async function(){
+	try {
+		const data = await fetch('/assessment/api/get_assessment?competition=ALL_COMPETITIONS', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': getCsrfToken()
+			}
+		}).then(handleResponse);
+		
+		if (data.length === 0) {
+			const container = document.querySelector('.see-assessment-container-comp');
+			container.innerHTML = '<p>No assignments present</p>';
+			return;
+		}
+		const container = document.querySelector('.see-assessment-container-comp');
+		container.innerHTML = '';
+		data.forEach(assessment => {
+			const assessmentDiv = document.createElement('div');
+			assessmentDiv.className = 'assessment-card';
+			assessmentDiv.innerHTML = `
+				<div class="assessment-title">${assessment.name}</div>
+				<p>${
+                    (() => {
+                        const desc = assessment.description;
+                        const matches = desc.match(/exam (.*?) in (.*?) on the topic (.*?)\. The difficulty level.*?(easy|medium|hard)/i);
+                        if (!matches) return assessment.description.length > 70 ? 
+                            assessment.description.substring(0, 70) + '...' : 
+                            assessment.description;
+                        
+                        return `Competition: ${matches[1]}<br>
+                                Subject: ${matches[2]}<br>
+                                Topic: ${matches[3]}<br>
+                                Difficulty: ${matches[4].charAt(0).toUpperCase() + matches[4].slice(1)}`;
+                    })()
+                }</p>
+				<p class="assessment-id">Assessment Id: ${assessment.id}</p>
+				<p>Due Date: ${assessment.due_date}</p>
+				<p>Standard: ${assessment.standard}</p>
+				<p>Section: ${assessment.section}</p>
+				<p>Duration: ${assessment.duration} minutes</p>
+				<button class="delete-assessment ${assessment.id}">Delete Assessment</button>
+				<button class="view-assessment ${assessment.id}">View Assessment</button>
+			`;
+			container.appendChild(assessmentDiv);
+
+			document.querySelectorAll('.see-assessment-container-comp .delete-assessment').forEach(button => {
+				button.addEventListener('click', async function() {
+					const assessmentId = this.classList[1];
+					try {
+						const responseData = await fetch('/assessment/api/delete_assessment', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': getCsrfToken()
+							},
+							body: JSON.stringify({ id: assessmentId })
+						}).then(handleResponse);
+						
+						alert('Assessment deleted successfully');
+						window.location.reload();
+					} catch (error) {
+						console.error('Error:', error);
+					}
+				});
+			});
+	
+			document.querySelectorAll('.see-assessment-container-comp .view-assessment').forEach(button => {
+				button.addEventListener('click', function() {
+					const assessmentId = this.classList[1];
+					const assessmentObj = data.find(obj => String(obj.id) === assessmentId);
+					
+					if (assessmentObj) {
+						const previewAssessment = document.querySelector('#preview-assessment-comp');
+						renderQuestions(assessmentObj.assessment, 'preview-assessment-comp', null);
+						previewAssessment.innerHTML = `<h1>Assessment Preview: ${assessmentObj.name}</h1>` + previewAssessment.innerHTML;
+					} else {
+						alert('Assessment not found');
+					}	
+				});
+			});
+		});
+	} catch (error) {
+		console.error('Error:', error);
+	}
+})
+
+
+
 document.querySelector('.section-attendance-summary form').addEventListener('submit', async function (event) {
 	event.preventDefault();
 	const form = event.target;

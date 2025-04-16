@@ -34,9 +34,6 @@ const handleResponse = async (response) => {
 function renderQuestions(assessment, containerId, assessmentDetails) {
     const assessmentData = assessment.assessment;
 
-    console.log(assessment);
-    console.log(assessmentData);
-
     const container = document.getElementById(containerId);
     // Clear previous questions
     container.innerHTML = '';
@@ -159,6 +156,105 @@ document.querySelector('.sb-assessment').addEventListener("click", async functio
                 `;
 
                 const closeButton = document.querySelector('.close-button');
+                closeButton.addEventListener('click', function() {
+                    assessmentResult.style.display = 'none';
+                    previewAssessment.innerHTML = '';
+                });
+            });
+        });
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
+
+document.querySelector('.sb-assessment-comp').addEventListener("click", async function(){
+    try {
+        const data = await fetch("/assessment/api/get_assessment?competition=ALL_COMPETITIONS", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            }
+        }).then(handleResponse);
+        
+        const container = document.querySelector('.section-assessment-comp .see-assessment-container');
+        
+        if (data.length === 0) {
+            container.innerHTML = '<p>No assignments present</p>';
+            return;
+        }
+        
+        container.innerHTML = '';
+        data.forEach(assessment => {
+            const assessmentDiv = document.createElement('div');
+            assessmentDiv.className = 'assessment-card';
+            assessmentDiv.innerHTML = `
+                <div class="assessment-title">${assessment.name}</div>
+                <p>${
+                    (() => {
+                        const desc = assessment.description;
+                        const matches = desc.match(/exam (.*?) in (.*?) on the topic (.*?)\. The difficulty level.*?(easy|medium|hard)/i);
+                        if (!matches) return assessment.description.length > 70 ? 
+                            assessment.description.substring(0, 70) + '...' : 
+                            assessment.description;
+                        
+                        return `Competition: ${matches[1]}<br>
+                                Subject: ${matches[2]}<br>
+                                Topic: ${matches[3]}<br>
+                                Difficulty: ${matches[4].charAt(0).toUpperCase() + matches[4].slice(1)}`;
+                    })()
+                }</p>
+                <p class="assessment-id">Assessment Id: ${assessment.id}</p>
+                <p>Due Date: ${assessment.due_date}</p>
+                <p>Standard: ${assessment.standard}</p>
+                <p>Section: ${assessment.section}</p>
+                <p>Duration: ${assessment.duration} minutes</p>
+            `;
+            if (assessment.status === 'submitted') {
+                assessmentDiv.innerHTML += `<button class="view-assessment ${assessment.id}">View Assessment</button>`;
+                assessmentDiv.innerHTML += `<button class="view-result ${assessment.id}">View Result</button>`;
+            } else if (assessment.status === 'not_submitted') {
+                assessmentDiv.innerHTML += `<a href="/assessment/take-assessment/${assessment.id}">Give Assessment</a>`;
+            } else if (assessment.status === 'missed') {
+                assessmentDiv.innerHTML += `<button class="view-assessment ${assessment.id}">View Assessment</button>`;
+                assessmentDiv.innerHTML += `<div class="missed-assessment">Missed Assessment</div>`;
+            }
+
+            container.appendChild(assessmentDiv);
+        });
+
+        document.querySelectorAll('.section-assessment-comp .view-assessment').forEach(button => {
+            button.addEventListener('click', function() {
+                const assessmentId = this.classList[1];
+                const selectedAssessment = data.find(a => a.id === parseInt(assessmentId));
+
+                const previewAssessment = document.querySelector('#preview-assessment-comp');
+
+                renderQuestions(selectedAssessment, 'preview-assessment-comp', null);
+                previewAssessment.innerHTML = `<h1>Assessment Preview: ${selectedAssessment.name}</h1>` + previewAssessment.innerHTML;
+            });
+        });
+
+        document.querySelectorAll('.section-assessment-comp .view-result').forEach(button => {
+            button.addEventListener('click', function() {
+                const assessmentId = this.classList[1];
+                const selectedAssessment = data.find(a => a.id === parseInt(assessmentId));
+
+                const previewAssessment = document.querySelector('.preview-assessment-comp');
+                previewAssessment.innerHTML = '';
+                
+                const assessmentResult = document.querySelector('.section-assessment-comp .assessment-result');
+                assessmentResult.style.display = 'flex';
+                selectedAssessment.remark = selectedAssessment.remark.replace(/\n/g, '<br>');
+                assessmentResult.innerHTML = `
+                    <h1>Result</h1>
+                    <p><span>Total Marks:</span> ${selectedAssessment.max_score}</p>
+                    <p><span>Marks Obtained:</span> ${selectedAssessment.obtained_score}</p>
+                    <p><span>Remarks:</span> ${selectedAssessment.remark}</p>
+                    <button class="close-button">Close</button>
+                `;
+
+                const closeButton = document.querySelector('.section-assessment-comp .close-button');
                 closeButton.addEventListener('click', function() {
                     assessmentResult.style.display = 'none';
                     previewAssessment.innerHTML = '';

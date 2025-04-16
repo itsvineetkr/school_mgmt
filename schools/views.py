@@ -297,7 +297,11 @@ def add_student(request):
     # Create a ClassAssessment entry for the student
     # Check if the class assessment already exists
     if ClassAssessment.objects.filter(
-        school=school, standard=standard, section=section, role="student"
+        account=studentAccount,  # Use the studentAccount object
+        school=school,
+        standard=standard,
+        section=section,
+        role="student",
     ).exists():
         return Response(
             {"status": 400, "message": "Class assessment already exists"}, status=400
@@ -1183,3 +1187,91 @@ def get_attendance(request):
             return Response({"status": 400, "message": str(e)}, status=400)
 
     return Response({"status": 401, "message": "Unauthorized role"}, status=401)
+
+
+@api_view(["GET"])
+def get_all_students(request):
+    if request.user.is_anonymous:
+        return Response({"status": 401, "message": "Unauthorized"}, status=401)
+
+    if request.user.role != "principal":
+        return Response({"status": 401, "message": "Unauthorized"}, status=401)
+
+    try:
+        school = AccountAffiliation.objects.get(account=request.user).school
+
+        # Get optional filter params
+        standard = request.GET.get("standard")
+        section = request.GET.get("section")
+
+        # Build base query
+        students = ClassAssessment.objects.filter(school=school, role="student")
+
+        # Apply optional filters
+        if standard:
+            try:
+                standard = int(standard)
+                students = students.filter(standard=standard)
+            except ValueError:
+                return Response(
+                    {"status": 400, "message": "Invalid standard parameter"}, status=400
+                )
+
+        if section:
+            section = section.lower()
+            students = students.filter(section=section)
+
+        # Annotate with all required fields
+        students = students.annotate(
+            username=F("account__username"),
+            email=F("account__email"),
+            phoneno=F("account__phoneno"),
+            gender=F("account__gender"),
+            dob=F("account__dob"),
+            standard=F("standard"),
+            section=F("section"),
+        )
+
+        return Response(
+            {
+                "status": 200,
+                "data": list(
+                    students.values(
+                        "username",
+                        "email",
+                        "phoneno",
+                        "gender",
+                        "dob",
+                        "standard",
+                        "section",
+                    )
+                ),
+            }
+        )
+
+    except AccountAffiliation.DoesNotExist:
+        return Response({"status": 404, "message": "School not found"}, status=404)
+
+
+@api_view(["GET"])
+def get_all_teachers(request):
+    if request.user.is_anonymous:
+        return Response({"status": 401, "message": "Unauthorized"}, status=401)
+
+    if request.user.role != "principal":
+        return Response({"status": 401, "message": "Unauthorized"}, status=401)
+
+    try:
+        school = AccountAffiliation.objects.get(account=request.user).school
+        teachers = AccountAffiliation.objects.filter(
+            school=school, account__role="teacher"
+        ).annotate(
+            username=F("account__username"),
+            email=F("account__email"),
+            phoneno=F("account__phoneno"),
+            gender=F("account__gender"),
+            dob=F("account__dob"),
+        )
+        return Response({"status": 200, "data": list(teachers.values())})
+    except AccountAffiliation.DoesNotExist:
+        return Response({"status": 404, "message": "School not found"}, status=404)

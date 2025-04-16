@@ -9,6 +9,11 @@ urlpatterns = [
     path("api/delete_assessment", views.delete_assessment, name="delete_assessment"),
     path("api/submit_assessment", views.submit_assessment, name="submit_assessment"),
     path(
+        "api/get_assessment_submissions",
+        views.get_assessment_submissions,
+        name="get_assessment_submissions",
+    ),
+    path(
         "take-assessment/<int:assessment_id>/",
         views.take_assessment,
         name="take_assessment",

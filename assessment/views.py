@@ -166,7 +166,7 @@ def get_assessments(request):
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
-    data = request.data
+    data = request.GET
     competition = data.get("competition")
     if not competition:
         competition = "SCHOOL"
@@ -180,6 +180,7 @@ def get_assessments(request):
         "NDA",
         "CLAT",
         "OLYMPIAD",
+        "ALL_COMPETITIONS",
     ]:
         return Response(
             {"error": "Invalid competition value."}, status=status.HTTP_400_BAD_REQUEST
@@ -194,6 +195,22 @@ def get_assessments(request):
         )
 
     if request.user.role == "teacher":
+        if competition == "ALL_COMPETITIONS":
+            assessments = AssessmentStore.objects.filter(
+                school=school,
+                teacher=request.user,
+                competition__in=[
+                    "CUET",
+                    "JEE_MAINS",
+                    "JEE_ADVANCE",
+                    "NEET",
+                    "NDA",
+                    "CLAT",
+                    "OLYMPIAD",
+                ],
+            ).values()
+            return Response(assessments, status=status.HTTP_200_OK)
+
         assessments = AssessmentStore.objects.filter(
             school=school, teacher=request.user, competition=competition
         ).values()
@@ -205,13 +222,31 @@ def get_assessments(request):
         )
         standard = classAssessment.standard
         section = classAssessment.section
+        if competition == "ALL_COMPETITIONS":
+            assessments = AssessmentStore.objects.filter(
+                school=school,
+                standard=standard,
+                section=section,
+                competition__in=[
+                    "CUET",
+                    "JEE_MAINS",
+                    "JEE_ADVANCE",
+                    "NEET",
+                    "NDA",
+                    "CLAT",
+                    "OLYMPIAD",
+                ],
+            )
+        else:
+            assessments = AssessmentStore.objects.filter(
+                school=school,
+                standard=standard,
+                section=section,
+                competition=competition,
+            )
         submitted_assessments = AssessmentSubmission.objects.filter(
             student=request.user,
             assessment__competition=competition,
-        )
-
-        assessments = AssessmentStore.objects.filter(
-            school=school, standard=standard, section=section, competition=competition
         )
 
         assessments_list = []
@@ -402,3 +437,62 @@ def submit_assessment(request):
         )
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["GET"])
+def get_assessment_submissions(request):
+    if request.user.is_anonymous or request.user.role != "teacher":
+        return Response(
+            {"error": "Authentication required."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    try:
+        school = AccountAffiliation.objects.get(account=request.user).school
+    except AccountAffiliation.DoesNotExist:
+        return Response(
+            {"error": "School affiliation not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    assessment_id = request.GET.get("assessment_id")
+    if not assessment_id:
+        return Response(
+            {"error": "Missing field: assessment_id"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        assessment = AssessmentStore.objects.get(id=assessment_id, school=school)
+    except AssessmentStore.DoesNotExist:
+        return Response(
+            {"error": "Assessment not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Get all students in the class
+    students = ClassAssessment.objects.filter(
+        school=school, standard=assessment.standard, section=assessment.section
+    ).select_related("account")
+
+    submissions = AssessmentSubmission.objects.filter(
+        assessment=assessment
+    ).select_related("student")
+
+    results = []
+    for student in students:
+        submission = next(
+            (s for s in submissions if s.student.email == student.account.email), None
+        )
+
+        results.append(
+            {
+                "student_email": student.account.email,
+                "student_name": student.account.username,
+                "status": "submitted" if submission else "not_submitted",
+                "score": submission.obtained_score if submission else None,
+                "max_score": submission.max_score if submission else None,
+                "remark": submission.remark if submission else None,
+            }
+        )
+
+    return Response(results, status=status.HTTP_200_OK)

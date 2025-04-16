@@ -25,6 +25,8 @@ urlpatterns = [
     path("api/get_attendance", views.get_attendance, name="get_attendance"),
     path("api/get_fee_status/", views.get_fee_status, name="get_fee_status"),
     path("api/update_fee_status", views.update_fee_status, name="update_fee_status"),
+    path("api/get_all_students", views.get_all_students, name="get_all_students"),
+    path("api/get_all_teachers", views.get_all_teachers, name="get_all_teachers"),
     path(
         "api/assigned_classes",
         views.get_assigned_classes_to_teachers,
