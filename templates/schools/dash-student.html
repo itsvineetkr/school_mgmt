@@ -7,9 +7,8 @@
 
 {% block sidebarButtons %}
     <div class="sidebar-button sb-assessment" data-target="section-assessment">Assessments</div>
-    <div class="sidebar-button" data-target="section-doubts">Clear Doubts</div>
-    <div class="sidebar-button" data-target="section-events">Events</div>
-    <div class="sidebar-button" data-target="section-attendance">Attendance</div>
+    <div class="sidebar-button sb-events" data-target="section-events">Events</div>
+    <div class="sidebar-button sb-attendance" data-target="section-attendance">Attendance</div>
 {% endblock sidebarButtons %}
 
 {% block content %}
@@ -25,22 +24,16 @@
     </div>
 </div>
 
-<div class="content-section section-doubts">
-	<div class="content-section-title">Clear Doubts</div>
-	
-</div>
-
 <div class="content-section section-events">
 	<div class="content-section-title">Events</div>
-	<form method="post">
-		{% csrf_token %}
-	
-	</form>
+	<div class="see-events-container">
+
+	</div>
 </div>
 
 <div class="content-section section-attendance">
 	<div class="content-section-title">Attendance</div>
-	<form method="post">
+	<form>
 		{% csrf_token %}
 	</form>
 </div>
@@ -73,7 +66,6 @@
 	}
 
 	const handleResponse = (response) => {
-		console.log('Response:', response);
 		if (response.ok) {
 			return response.json().then((data) => {
 				return data
@@ -155,7 +147,6 @@
 			const container = document.querySelector('.see-assessment-container');
 			container.innerHTML = '';
 			data.forEach(assessment => {
-                console.log(assessment);
 				const assessmentDiv = document.createElement('div');
 				assessmentDiv.className = 'assessment-card';
 				assessmentDiv.innerHTML = `
@@ -167,7 +158,6 @@
 					<p>Section: ${assessment.section}</p>
 					<p>Duration: ${assessment.duration} minutes</p>
 				`;
-				console.log(assessment.status);
                 if (assessment.status === 'submitted') {
                     assessmentDiv.innerHTML += `<button class="view-assessment ${assessment.id}">View Assessment</button>`;
                     assessmentDiv.innerHTML += `<button class="view-result ${assessment.id}">View Result</button>`;
@@ -226,10 +216,92 @@
 		.catch(error => console.error('Error:', error));
 	})
 
-    document.querySelector('.result-header').addEventListener('click', function() {
-        console.log('Close button clicked');
-        const assessmentResult = document.querySelector('.assessment-result');
-        assessmentResult.style.display = 'none';
-    });
+	document.querySelector('.sb-events').addEventListener("click", function(){
+		fetch('/schools/api/event', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': getCsrfToken()
+			}
+		})
+		.then(handleResponse)
+		.then(data => {
+			if (data.length === 0) {
+				const container = document.querySelector('.see-events-container');
+				container.innerHTML = '<p>No events present</p>';
+				return;
+			}
+			const container = document.querySelector('.see-events-container');
+			data = data.data;
+			data.forEach(event => {
+				const eventDiv = document.createElement('div');
+				eventDiv.className = 'assessment-card';
+				eventDiv.innerHTML = `
+					<div class="assessment-title">${event.eventName}</div>
+					<p class="assessment-description">${event.description}</p>
+					<p>Event Date: ${event.date}</p>
+					<p>Venue: ${event.venue}</p>
+				`;
+				container.appendChild(eventDiv);
+			});
+		})
+		.catch(error => console.error('Error:', error));
+	})
+
+	document.querySelector('.sb-attendance').addEventListener("click", function(){
+		const currentMonth = new Date().getMonth() + 1;  // getMonth() returns 0-11
+		
+		fetch(`/schools/api/get_attendance?month=${currentMonth}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': getCsrfToken()
+			}
+		})
+		.then(handleResponse)
+		.then(response => {
+			console.log(response);
+			if (response.status === 200) {
+				const attendanceData = response.data;
+				const attendanceSection = document.querySelector('.section-attendance');
+				
+				const attendanceCard = document.createElement('div');
+				attendanceCard.className = 'attendance-card';
+				
+				const monthNames = ["January", "February", "March", "April", "May", "June",
+								  "July", "August", "September", "October", "November", "December"];
+				
+				attendanceCard.innerHTML = `
+					<div class="attendance-stats">
+						<h2>${monthNames[attendanceData.month - 1]} Attendance</h2>
+						<div class="stats-container">
+							<div class="stat-item present">
+								<span class="stat-value">${attendanceData.present_days}</span>
+								<span class="stat-label">Present Days</span>
+							</div>
+							<div class="stat-item absent">
+								<span class="stat-value">${attendanceData.absent_days}</span>
+								<span class="stat-label">Absent Days</span>
+							</div>
+							<div class="stat-item percentage">
+								<span class="stat-value">${Math.round((attendanceData.present_days / (attendanceData.present_days + attendanceData.absent_days)) * 100)}%</span>
+								<span class="stat-label">Attendance Rate</span>
+							</div>
+						</div>
+					</div>
+				`;
+				
+				// Clear previous content and add new card
+				const contentArea = attendanceSection.querySelector('.content-section-title').nextElementSibling;
+				if (contentArea) {
+					contentArea.innerHTML = '';
+					contentArea.appendChild(attendanceCard);
+				} else {
+					attendanceSection.appendChild(attendanceCard);
+				}
+			}
+		})
+		.catch(error => console.error('Error:', error));
+	})
 </script>
 {% endblock %}

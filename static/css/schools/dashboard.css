@@ -654,3 +654,265 @@ body a {
         overflow-x: auto;
     }
 }
+
+
+
+
+
+
+
+.see-events-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 20px;
+    justify-items: start;
+    margin-top: 30px;
+}
+
+
+#preview-assessment {
+    margin: 20px 0;
+}
+
+.see-events-container .assessment-card {
+    background-color: #484747;
+    border-radius: 8px;
+    width: 300px;
+    max-width: 100%;
+    height: 100%;
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    ;
+}
+
+.see-events-container .assessment-card button {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#preview-assessment h1 {
+    padding: 30px 10px;
+    font-weight: 500;
+}
+
+.see-events-container .assessment-card .assessment-title {
+    font-size: 20px;
+    width: 100%;
+    text-align: left;
+}
+
+.see-events-container .assessment-card .assessment-description {
+    font-size: 16px;
+    color: #cccc;
+    margin: 10px 0 10px 0;
+    text-align: left;
+    width: 100%;
+}
+
+.see-events-container .assessment-card .assessment-id {
+    font-size: 12px;
+    color: #999;
+}
+
+.see-events-container .assessment-card p {
+    font-size: 12px;
+    width: 100%;
+    text-align: left;
+    color: #cccc;
+}
+
+.see-events-container .assessment-card a {
+    text-decoration: none;
+    font-family: "Poppins", serif;
+    font-weight: 500;
+    padding: 8px 12px;
+    width: 100%;
+    max-width: 90vw;
+    margin-top: 12px;
+    border-radius: 7px;
+    background-color: rgb(118, 252, 125);
+    color: rgb(0, 0, 0);
+    text-align: center;
+    font-size: 13px;
+}
+
+@media (max-width: 1100px) {
+    .see-events-container {
+        grid-template-columns: 1fr 1fr;
+        padding: 15px;
+    }
+
+    .see-events-container .assessment-card {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 968px) {
+    .see-events-container {
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+
+    .see-events-container .assessment-card {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+.assessment-result {
+    width: 400px;
+    max-width: 90vw;
+    padding: 20px;
+    border-radius: 12px;
+    background-color: rgb(30, 32, 33);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+
+.assessment-result h1 {
+    font-size: 20px;
+    width: 100%;
+    text-align: left;
+}
+
+.assessment-result p {
+    font-size: 16px;
+    width: 100%;
+    text-align: left;
+    color: #cccc;
+}
+
+
+.assessment-result span {
+    color: white;
+}
+
+.assessment-result .close-button {
+    margin: 20px 0px 0px 0px;
+    width: 90%;
+    background-color: rgb(212, 85, 85);
+}
+
+.assessment-result .close-button:hover {
+    background-color: rgb(224, 71, 71);
+    cursor: pointer;
+}
+
+.missed-assessment {
+    color: rgb(224, 71, 71);
+    margin: 20px 0px 0px 0px;
+    font-size: 16px;
+}
+
+.schoolsTableAdmin {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: rgb(30, 32, 33);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.schoolsTableAdmin th,
+.schoolsTableAdmin td {
+    border: 1px solid rgb(55, 58, 60);
+    padding: 12px;
+    text-align: left;
+}
+
+.schoolsTableAdmin th {
+    background-color: rgb(55, 58, 60);
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.schoolsTableAdmin td {
+    background-color: rgb(30, 32, 33);
+    color: #fff;
+    font-size: 13px;
+}
+
+.schoolsTableAdmin tr:nth-child(even) td {
+    background-color: rgb(24, 26, 27);
+}
+
+.schoolsTableAdmin tr:hover td {
+    background-color: rgb(45, 45, 45);
+}
+
+@media (max-width: 768px) {
+    .schoolsTableAdmin {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+.attendance-card {
+    background: rgb(40, 42, 43);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    margin: 20px;
+}
+
+.attendance-stats h2 {
+    color: #fff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    flex: 1;
+}
+
+.stat-value {
+    display: block;
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    color: #ccc;
+    font-size: 0.9em;
+}
+
+.present {
+    background: #1a2327;
+    color: #64b5f6;
+}
+
+.absent {
+    background: #2d1f1f;
+    color: #ef5350;
+}
+
+.percentage {
+    background: #1b2620;
+    color: #81c784;
+}

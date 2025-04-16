@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "schools",
     "rest_framework",
     "assessment",
+    "django_q",
 ]
 
 MIDDLEWARE = [
@@ -163,3 +164,19 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 # SENDGRID_TRACK_EMAIL_OPENS = True
 # SENDGRID_TRACK_CLICKS_HTML = True
 # SENDGRID_TRACK_CLICKS_PLAIN = True
+
+
+Q_CLUSTER = {
+    "name": "DjangORM",
+    "workers": 1,  # Number of workers (adjust based on your plan)
+    "recycle": 500,  # Maximum tasks per worker before recycling
+    "timeout": 900,  # Task timeout in seconds
+    "retry": 920,
+    "compress": True,  # Compress task data
+    "save_limit": 250,  # Number of successful tasks to save
+    "queue_limit": 500,  # Maximum queue size
+    "cpu_affinity": 1,  # Number of CPUs used per worker
+    "label": "Django Q",  # Label for the cluster
+    "orm": "default",  # Database configuration from DATABASES
+    "catch_up": False,  # Don't execute missed tasks on startup
+}

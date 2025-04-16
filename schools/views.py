@@ -27,6 +27,7 @@ def dashboard(request):
         except AccountAffiliation.DoesNotExist:
             context["school"] = None
         return render(request, "schools/dash-principal.html", context)
+
     if request.user.role == "teacher":
         context = {}
         standards = [
@@ -72,6 +73,12 @@ def dashboard(request):
         affiliations = AccountAffiliation.objects.filter(account__role="principal")
         principals_and_schools = []
         for affiliation in affiliations:
+            no_of_students = ClassAssessment.objects.filter(
+                school=affiliation.school, role="student"
+            ).count()
+            no_of_teachers = ClassAssessment.objects.filter(
+                school=affiliation.school, role="teacher"
+            ).count()
             principals_and_schools.append(
                 {
                     "school_name": affiliation.school.schoolName,
@@ -79,6 +86,8 @@ def dashboard(request):
                     "principal_name": affiliation.account.username,
                     "email": affiliation.account.email,
                     "phone": affiliation.account.phoneno,
+                    "no_of_students": no_of_students,
+                    "no_of_teachers": no_of_teachers,
                 }
             )
         context["schools"] = principals_and_schools
@@ -122,8 +131,8 @@ def dashboard(request):
 
                 # Create school
                 school = RegisteredSchool(
-                    unique_code=school_data["unique_code"],
-                    name=school_data["name"],
+                    uniqueSchoolCode=school_data["unique_code"],
+                    schoolName=school_data["name"],
                     address=school_data["address"],
                     logo=school_data["logo"],
                 )
@@ -138,7 +147,7 @@ def dashboard(request):
 
                 try:
                     school = RegisteredSchool.objects.get(
-                        unique_code=school_unique_code
+                        uniqueSchoolCode=school_unique_code
                     )
                     principal = CustomUser.objects.get(email=email, role="principal")
                     AccountAffiliation.objects.get(
@@ -1091,3 +1100,86 @@ def change_password(request):
 
     except Exception as e:
         return Response({"status": 400, "message": str(e)}, status=400)
+
+
+@api_view(["GET"])
+def get_attendance(request):
+    if request.user.is_anonymous:
+        return Response({"status": 401, "message": "Unauthorized"}, status=401)
+
+    data = request.GET
+    try:
+        month = int(data.get("month"))
+        if month < 1 or month > 12:
+            return Response({"status": 400, "message": "Invalid month"}, status=400)
+    except:
+        return Response(
+            {"status": 400, "message": "Month parameter required"}, status=400
+        )
+
+    if request.user.role in ["teacher", "principal"]:
+        try:
+            standard = int(data.get("standard"))
+            section = str(data.get("section")).lower()
+        except:
+            return Response(
+                {"status": 400, "message": "Standard and section required"}, status=400
+            )
+
+        try:
+            school = AccountAffiliation.objects.get(account=request.user).school
+            # Get all students in the specified class
+            students = ClassAssessment.objects.filter(
+                school=school, standard=standard, section=section, role="student"
+            ).values_list("account", flat=True)
+
+            result = []
+            for student_email in students:
+                student = CustomUser.objects.get(email=student_email)
+                present_count = Attendance.objects.filter(
+                    school=school, student=student, date__month=month, status="P"
+                ).count()
+
+                absent_count = Attendance.objects.filter(
+                    school=school, student=student, date__month=month, status="A"
+                ).count()
+
+                result.append(
+                    {
+                        "student_name": student.username,
+                        "email": student.email,
+                        "present_days": present_count,
+                        "absent_days": absent_count,
+                    }
+                )
+
+            return Response({"status": 200, "data": result})
+
+        except AccountAffiliation.DoesNotExist:
+            return Response({"status": 404, "message": "School not found"}, status=404)
+
+    elif request.user.role == "student":
+        try:
+            present_count = Attendance.objects.filter(
+                student=request.user, date__month=month, status="P"
+            ).count()
+
+            absent_count = Attendance.objects.filter(
+                student=request.user, date__month=month, status="A"
+            ).count()
+
+            return Response(
+                {
+                    "status": 200,
+                    "data": {
+                        "present_days": present_count,
+                        "absent_days": absent_count,
+                        "month": month,
+                    },
+                }
+            )
+
+        except Exception as e:
+            return Response({"status": 400, "message": str(e)}, status=400)
+
+    return Response({"status": 401, "message": "Unauthorized role"}, status=401)

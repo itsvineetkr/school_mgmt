@@ -22,6 +22,7 @@ urlpatterns = [
     path("api/add_event", views.add_event, name="add_event"),
     path("api/delete_event", views.delete_event, name="delete_event"),
     path("api/add_attendance", views.add_attendance, name="add_attendance"),
+    path("api/get_attendance", views.get_attendance, name="get_attendance"),
     path("api/get_fee_status/", views.get_fee_status, name="get_fee_status"),
     path("api/update_fee_status", views.update_fee_status, name="update_fee_status"),
     path(

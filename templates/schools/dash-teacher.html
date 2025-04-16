@@ -5,8 +5,6 @@
 <link rel="stylesheet" href="{% static 'css/assessment/preview.css' %}">
 {% endblock style %}
 
-
-
 {% block sidebarButtons %}
 <div class="sidebar-button" data-target="section-make-assessment">Make Assessment</div>
 <div class="sidebar-button sb-see-assessment" data-target="section-see-assessment">See Assessments</div>
@@ -74,6 +72,10 @@
 		<input type="text" name="section" placeholder="Section" />
 		<button type="submit">Get Summary</button>
 	</form>
+	<div class="students-list attendance-summary">
+		<!-- Attendance summary will be populated here -->
+
+	</div>
 </div>
 
 <div class="content-section section-add-attendance">
@@ -665,5 +667,71 @@
 		})
 		.catch(error => console.error('Error:', error));
 	})
+
+
+	document.querySelector('.section-attendance-summary form').addEventListener('submit', function (event) {
+		event.preventDefault();
+		const form = event.target;
+		const standard = form.querySelector('[name="class"]').value;
+		const section = form.querySelector('[name="section"]').value;
+		const currentDate = new Date();
+		const currentMonth = currentDate.getMonth() + 1;
+
+		fetch(`/schools/api/get_attendance?month=${currentMonth}&standard=${standard}&section=${section}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': getCsrfToken()
+			}
+		})
+		.then(handleResponse)
+		.then(data => {
+			const summarySection = document.querySelector('.attendance-summary');
+			const existingTable = summarySection.querySelector('table');
+			if (existingTable) {
+				existingTable.remove();
+			}
+
+			const table = document.createElement('table');
+			const thead = document.createElement('thead');
+			const headerRow = document.createElement('tr');
+			const headers = ['Student Name', 'Email', 'Present Days', 'Absent Days'];
+			
+			headers.forEach(headerText => {
+				const th = document.createElement('th');
+				th.textContent = headerText;
+				headerRow.appendChild(th);
+			});
+			thead.appendChild(headerRow);
+			table.appendChild(thead);
+
+			const tbody = document.createElement('tbody');
+			data.data.forEach(item => {
+				const row = document.createElement('tr');
+				
+				const nameCell = document.createElement('td');
+				nameCell.textContent = item.student_name;
+				row.appendChild(nameCell);
+				
+				const emailCell = document.createElement('td');
+				emailCell.textContent = item.email;
+				row.appendChild(emailCell);
+				
+				const presentCell = document.createElement('td');
+				presentCell.textContent = item.present_days;
+				row.appendChild(presentCell);
+				
+				const absentCell = document.createElement('td');
+				absentCell.textContent = item.absent_days;
+				row.appendChild(absentCell);
+				
+				tbody.appendChild(row);
+			});
+			table.appendChild(tbody);
+			summarySection.appendChild(table);
+		})
+		.catch(error => console.error('Error:', error));
+	});
+
 </script>
 {% endblock %}
