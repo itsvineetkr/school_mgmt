@@ -13,6 +13,20 @@ class AssessmentStore(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(12)],
     )
     section = models.CharField(max_length=1)
+    competition = models.CharField(
+        max_length=255,
+        choices=[
+            ("SCHOOL", "School"),
+            ("CUET", "CUET"),
+            ("JEE_MAINS", "JEE Mains"),
+            ("JEE_ADVANCE", "JEE Advance"),
+            ("NEET", "NEET"),
+            ("NDA", "NDA"),
+            ("CLAT", "CLAT"),
+            ("OLYMPIAD", "Olympiad"),
+        ],
+        default="SCHOOL",
+    )
     teacher = models.ForeignKey(
         "accounts.CustomUser", on_delete=models.CASCADE, null=False, blank=False
     )

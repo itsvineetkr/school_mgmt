@@ -7,6 +7,7 @@
 
 {% block sidebarButtons %}
 <div class="sidebar-button" data-target="section-make-assessment">Make Assessment</div>
+<div class="sidebar-button" data-target="section-make-competition-assessment">Make Competition Assessment</div>
 <div class="sidebar-button sb-see-assessment" data-target="section-see-assessment">See Assessments</div>
 <div class="sidebar-button" data-target="section-fee-status-update">Fee Status Update</div>
 <div class="sidebar-button" data-target="section-fee-status-check">Fee Status Check</div>
@@ -20,7 +21,7 @@
 	<form method="post">
 		{% csrf_token %}
 		<input type="text" name="assessment_name" placeholder="Assessment Name" />
-		<textarea name="description" placeholder="What is the assessment?"></textarea>
+		<textarea name="description" placeholder="What is the assessment? Type the topics or give some elaboration."></textarea>
         <select name="standard">
 			<option value="">Select Class</option>
             {% for standard, section in standards %}
@@ -32,11 +33,17 @@
 			<input type="date" name="due_date" />
 		</div>
 		<input type="number" name="max_time" placeholder="Max Time (minutes)" min="0" step="30"/>
-		<select name="question_types" id="">
+		<select name="question_types">
 			<option value="">Select Question Type</option>
 			<option value="MCQ">MCQ</option>
 			<option value="Written">Written</option>
 			<option value="Mix">Mix</option>
+		</select>
+		<select name="difficulty">
+			<option value="">Select Difficulty</option>
+			<option value="hard">Hard</option>
+			<option value="moderate">Moderate</option>
+			<option value="Mix">Easy</option>
 		</select>
 		<input type="number" name="num_questions" placeholder="Number of Questions" min="1" />
 		<button type="submit" class="generate-assessment-button">Generate</button>
@@ -51,6 +58,62 @@
 			</div>
 		</div>
 		<button class="confirm-assessment-button">Confirm</button>
+	</form>
+</div>
+
+<div class="content-section section-make-competition-assessment">
+	<div class="content-section-title">Make Competition Assessment</div>
+	<form method="post">
+		{% csrf_token %}
+		<input type="text" name="assessment_name" placeholder="Assessment Name" />
+        <select name="standard">
+			<option value="">Select Class</option>
+            {% for standard, section in standards %}
+            <option value="{{ standard }}-{{ section }}">{{ standard }}-{{ section }}</option>
+            {% endfor %}
+        </select>
+		<select name="competition_type">
+			<option value="">Select Competition Type</option>
+			<option value="CUET">CUET</option>
+			<option value="JEE_MAINS">JEE Mains</option>
+			<option value="JEE_ADVANCE">JEE Advance</option>
+			<option value="NEET">NEET</option>
+			<option value="NDA">NDA</option>
+			<option value="CLAT">CLAT</option>
+			<option value="OLYMPIAD">Olympiad</option>
+		</select>
+		<input type="text" name="subject" placeholder="Subject" />
+		<input type="text" name="topic" placeholder="Topic" />
+		<div class="input-date">
+			<label>Due Date:</label>
+			<input type="date" name="due_date" />
+		</div>
+		<input type="number" name="max_time" placeholder="Max Time (minutes)" min="0" step="30"/>
+		<select name="question_types">
+			<option value="">Select Question Type</option>
+			<option value="MCQ">MCQ</option>
+			<option value="Written">Written</option>
+			<option value="Mix">Mix</option>
+		</select>
+		<select name="difficulty">
+			<option value="">Select Difficulty</option>
+			<option value="hard">Hard</option>
+			<option value="moderate">Moderate</option>
+			<option value="Mix">Easy</option>
+		</select>
+		<input type="number" name="num_questions" placeholder="Number of Questions" min="1" />
+		<button type="submit" class="generate-assessment-button-comp">Generate</button>
+		<div class="preview">
+			<div class="assessment-container-comp">
+				<div class="assessment-info assessment-info-comp">
+				</div>
+				
+				<div id="questions-container-comp">
+					<!-- Questions will be populated here -->
+				</div>
+			</div>
+		</div>
+		<button class="confirm-assessment-button-comp">Confirm</button>
 	</form>
 </div>
 
@@ -82,7 +145,7 @@
 	<div class="content-section-title">Add Attendance</div>
 	<form method="post">
 		{% csrf_token %}
-		<select name="class" id="">
+		<select name="class">
 			<option value="">Select Class</option>
 			{% for standard, section in standards %}
 			<option value="{{ standard }}-{{ section }}">{{ standard }}-{{ section }}</option>
@@ -412,12 +475,12 @@
 
 	document.querySelector('.assessment-info').style.display = 'none';
 
-	function renderQuestions(assessmentData, containerId, assessmentDetails) {
+	function renderQuestions(assessmentData, containerId, assessmentDetails, infoContainerId = '.assessment-info') {
 		const container = document.getElementById(containerId);
 		// Clear previous questions
 		container.innerHTML = '';
 		if (assessmentDetails) {
-			const assessmentInfo = document.querySelector('.assessment-info');
+			const assessmentInfo = document.querySelector(infoContainerId);
 			assessmentInfo.style.display = 'block';
 			// Clear previous assessment details
 			assessmentInfo.innerHTML = '';
@@ -479,7 +542,7 @@
     // Add click handler specifically for the generate button
     generateButton.addEventListener('click', function(event) {
         event.preventDefault();
-        
+        console.log("hua bhai kuch to")
         // Disable button and show loading animation
         generateButton.disabled = true;
         let loadingText = "Generating";
@@ -490,12 +553,15 @@
         }, 400);
         
         const assessmentName = assessmentForm.querySelector('[name="assessment_name"]').value;
-        const description = assessmentForm.querySelector('[name="description"]').value;
+        let description = assessmentForm.querySelector('[name="description"]').value;
         const standard = assessmentForm.querySelector('[name="standard"]').value;
         const dueDate = assessmentForm.querySelector('[name="due_date"]').value;
         const maxTime = assessmentForm.querySelector('[name="max_time"]').value;
+        const difficulty = assessmentForm.querySelector('[name="difficulty"]').value;
         const questionTypes = assessmentForm.querySelector('[name="question_types"]').value;
         const numQuestions = assessmentForm.querySelector('[name="num_questions"]').value;
+
+		description += "\n" + "The difficulty level of the questions should be " + difficulty;
 
         fetch('/assessment/api/generate', {
             method: 'POST',
@@ -733,5 +799,154 @@
 		.catch(error => console.error('Error:', error));
 	});
 
+	// ----------------------COMPETITION---------------------------
+
+
+	document.querySelector('.confirm-assessment-button-comp').style.display = 'none';
+	document.querySelector('.generate-assessment-button-comp').innerHTML = 'Generate';
+
+	const assessmentFormComp = document.querySelector('.section-make-competition-assessment form');
+    const generateButtonComp = assessmentFormComp.querySelector('.generate-assessment-button-comp');
+    const confirmButtonComp = assessmentFormComp.querySelector('.confirm-assessment-button-comp');
+    
+    // Store assessment data at a higher scope so it's available to both functions
+    let assessmentDataComp = null;
+    let assessmentDetailsComp = null;
+    
+	document.querySelector('.assessment-info-comp').style.display = 'none';
+    // Prevent the form from submitting on Enter key or general submission
+    assessmentFormComp.addEventListener('submit', function(event) {
+        event.preventDefault();
+    });
+    
+    // Add click handler specifically for the generate button
+    generateButtonComp.addEventListener('click', function(event) {
+        event.preventDefault();
+        
+        // Disable button and show loading animation
+        generateButtonComp.disabled = true;
+        let loadingText = "Generating";
+        let dotCount = 0;
+        const loadingInterval = setInterval(() => {
+            dotCount = (dotCount + 1) % 4;
+            generateButtonComp.innerHTML = loadingText + ".".repeat(dotCount);
+        }, 400);
+        
+        const assessmentName = assessmentFormComp.querySelector('[name="assessment_name"]').value;
+		const competitionType = assessmentFormComp.querySelector('[name="competition_type"]').value;
+		const subject = assessmentFormComp.querySelector('[name="subject"]').value;
+		const topic = assessmentFormComp.querySelector('[name="topic"]').value;
+        const standard = assessmentFormComp.querySelector('[name="standard"]').value;
+        const dueDate = assessmentFormComp.querySelector('[name="due_date"]').value;
+        const maxTime = assessmentFormComp.querySelector('[name="max_time"]').value;
+        const difficulty = assessmentFormComp.querySelector('[name="difficulty"]').value;
+        const questionTypes = assessmentFormComp.querySelector('[name="question_types"]').value;
+        const numQuestions = assessmentFormComp.querySelector('[name="num_questions"]').value;
+
+		let description = `The assessment is for Indian competitive exam ${competitionType} in ${subject} on the topic ${topic}. The difficulty level of the questions should be ${difficulty}.`;
+		description += "\n" + "Please create good and correct assessment, only add questions you are sure of and those which you yourself can answer.";
+
+        fetch('/assessment/api/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({
+                assessment_name: assessmentName,
+                assessment_description: description,
+                question_types: questionTypes,
+                standard: standard,
+                num_questions: numQuestions,
+                duration: maxTime,
+            })
+        })
+        .then(handleResponse)
+        .then(data => {
+            // Clear loading animation
+            clearInterval(loadingInterval);
+            generateButtonComp.disabled = false;
+            
+            assessmentDataComp = data.assessment;
+            assessmentDetails = data.details;
+			assessmentDetails.assessment_description = assessmentDetails.assessment_description.split('Please create good and correct assessment, only add questions you')[0];
+            renderQuestions(assessmentDataComp, 'questions-container-comp', assessmentDetails, ".assessment-info-comp");
+            confirmButtonComp.style.display = 'block';
+            generateButtonComp.innerHTML = 'Regenerate';
+        })
+        .catch(error => {
+            // Clear loading animation on error too
+            clearInterval(loadingInterval);
+            generateButtonComp.disabled = false;
+            generateButtonComp.innerHTML = 'Generate';
+            console.error('Error:', error);
+            alert('Error generating assessment: ' + (error.message || 'Unknown error'));
+        });
+    });
+    
+    // Add click handler specifically for the confirm button
+    confirmButtonComp.addEventListener('click', function(event) {
+        event.preventDefault();
+        
+        // Only proceed if we have assessment data
+        if (!assessmentDataComp) {
+            alert('Please generate an assessment first');
+            return;
+        }
+        
+        // Disable button and show loading animation
+        confirmButtonComp.disabled = true;
+        let loadingText = "Saving";
+        let dotCount = 0;
+        const loadingInterval = setInterval(() => {
+            dotCount = (dotCount + 1) % 4;
+            confirmButtonComp.innerHTML = loadingText + ".".repeat(dotCount);
+        }, 400);
+        
+        const assessmentName = assessmentFormComp.querySelector('[name="assessment_name"]').value;
+		const competitionType = assessmentFormComp.querySelector('[name="competition_type"]').value;
+        const description = assessmentFormComp.querySelector('[name="description"]').value;
+        const standard = assessmentFormComp.querySelector('[name="standard"]').value;
+        const dueDate = assessmentFormComp.querySelector('[name="due_date"]').value;
+        const maxTime = assessmentFormComp.querySelector('[name="max_time"]').value;
+
+        fetch('/assessment/api/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({
+                assessment_name: assessmentName,
+                assessment_description: description,
+                standard: standard.split('-')[0],
+                section: standard.split('-')[1],
+				competition: competitionType,
+                assessment: assessmentDataComp,
+                due_date: dueDate,
+                duration: maxTime
+            })
+        })
+        .then(handleResponse)
+        .then(data => {
+            clearInterval(loadingInterval);
+            confirmButtonComp.disabled = false;
+            confirmButtonComp.innerHTML = 'Confirm';
+            alert('Assessment created successfully');
+            window.location.reload();
+        })
+        .catch(error => {
+            clearInterval(loadingInterval);
+            confirmButtonComp.disabled = false;
+            confirmButtonComp.innerHTML = 'Confirm';
+            console.error('Error:', error);
+            alert('Error saving assessment: ' + (error.message || 'Unknown error'));
+        });
+    });
+    
+    // Hide confirm button initially
+    confirmButtonComp.style.display = 'none';
+
+	
 </script>
 {% endblock %}

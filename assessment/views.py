@@ -152,6 +152,23 @@ def get_assessments(request):
         )
 
     data = request.data
+    competition = data.get("competition")
+    if not competition:
+        competition = "SCHOOL"
+
+    if competition not in [
+        "SCHOOL",
+        "CUET",
+        "JEE_MAINS",
+        "JEE_ADVANCE",
+        "NEET",
+        "NDA",
+        "CLAT",
+        "OLYMPIAD",
+    ]:
+        return Response(
+            {"error": "Invalid competition value."}, status=status.HTTP_400_BAD_REQUEST
+        )
 
     try:
         school = AccountAffiliation.objects.get(account=request.user).school
@@ -163,7 +180,7 @@ def get_assessments(request):
 
     if request.user.role == "teacher":
         assessments = AssessmentStore.objects.filter(
-            school=school, teacher=request.user
+            school=school, teacher=request.user, competition=competition
         ).values()
         return Response(assessments, status=status.HTTP_200_OK)
 
@@ -174,11 +191,12 @@ def get_assessments(request):
         standard = classAssessment.standard
         section = classAssessment.section
         submitted_assessments = AssessmentSubmission.objects.filter(
-            student=request.user
+            student=request.user,
+            assessment__competition=competition,
         )
 
         assessments = AssessmentStore.objects.filter(
-            school=school, standard=standard, section=section
+            school=school, standard=standard, section=section, competition=competition
         )
 
         assessments_list = []
