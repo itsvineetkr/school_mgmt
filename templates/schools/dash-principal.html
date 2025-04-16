@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block sidebarButtons %}
+<div class="sidebar-button" data-target="section-view-all">View All</div>
 <div class="sidebar-button" data-target="section-add-teacher">Add New Teacher</div>
 <div class="sidebar-button" data-target="section-add-student">Add New Student</div>
 <div class="sidebar-button" data-target="section-bulk-add-student">Bluk Add Student</div>
@@ -18,6 +19,26 @@
 {% endblock %}
 
 {% block content %}
+<div class="content-section section-view-all">
+	<div class="content-section-title">View All</div>
+	<form method="post">
+		{% csrf_token %}
+		<select name="view_type" required>
+			<option value="">Select Type</option>
+			<option value="students">All Students</option>
+			<option value="teachers">All Teachers</option>
+		</select>
+		<div class="student-filters" style="display:none; flex-direction: column;">
+			<input type="text" name="standard" placeholder="Class (leave blank for all)" />
+			<input type="text" name="section" placeholder="Section (leave blank for all)" />
+		</div>
+		<button type="submit">View</button>
+	</form>
+	<div class="results-list students-list">
+		<!-- Results will be populated here -->
+	</div>
+</div>
+
 <div class="content-section section-add-teacher">
 	<div class="content-section-title">Add New Teacher</div>
 	<form method="post">

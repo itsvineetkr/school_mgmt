@@ -597,3 +597,74 @@ document.querySelector('.section-attendance-summary form').addEventListener('sub
         console.error('Error:', error);
     }
 });
+
+// View All Form Handler
+document.querySelector('.section-view-all form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    const form = event.target;
+    const viewType = form.querySelector('[name="view_type"]').value;
+    const standard = form.querySelector('[name="standard"]')?.value || '';
+    const section = form.querySelector('[name="section"]')?.value || '';
+
+    try {
+        let url = viewType === 'students' 
+            ? `api/get_all_students?standard=${standard}&section=${section}`
+            : 'api/get_all_teachers';
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            }
+        });
+        const data = await handleResponse(response);
+        
+        const resultsSection = document.querySelector('.results-list');
+        resultsSection.innerHTML = '';
+
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        // Define headers based on view type
+        const headers = viewType === 'students' 
+            ? ['Name', 'Email', 'Phone', 'Gender', 'DOB', 'Class', 'Section']
+            : ['Name', 'Email', 'Phone', 'Gender', 'DOB'];
+        
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        data.data.forEach(item => {
+            const row = document.createElement('tr');
+            
+            const cells = viewType === 'students' 
+                ? [item.username, item.email, item.phoneno, item.gender, item.dob, item.standard, item.section]
+                : [item.username, item.email, item.phoneno, item.gender, item.dob];
+            
+            cells.forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText || '';
+                row.appendChild(td);
+            });
+            
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody);
+        resultsSection.appendChild(table);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
+
+// Show/hide student filters based on view type selection
+document.querySelector('[name="view_type"]').addEventListener('change', function() {
+    const studentFilters = document.querySelector('.student-filters');
+    studentFilters.style.display = this.value === 'students' ? 'flex' : 'none';
+});

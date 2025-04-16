@@ -1228,8 +1228,6 @@ def get_all_students(request):
             phoneno=F("account__phoneno"),
             gender=F("account__gender"),
             dob=F("account__dob"),
-            standard=F("standard"),
-            section=F("section"),
         )
 
         return Response(
