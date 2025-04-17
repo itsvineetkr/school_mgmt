@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "schools",
     "rest_framework",
     "assessment",
-    "django_q",
 ]
 
 MIDDLEWARE = [
