@@ -29,7 +29,7 @@ class AccountAffiliation(models.Model):
     registered_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.school.uniqueSchoolCode} - {self.account.username}"
+        return f"{self.school} - {self.account}"
 
 
 class ClassAssessment(models.Model):

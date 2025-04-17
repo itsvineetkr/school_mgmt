@@ -27,6 +27,7 @@ urlpatterns = [
     path("api/update_fee_status", views.update_fee_status, name="update_fee_status"),
     path("api/get_all_students", views.get_all_students, name="get_all_students"),
     path("api/get_all_teachers", views.get_all_teachers, name="get_all_teachers"),
+    path("api/send_montly_attendance_mail", views.send_montly_attendance_mail, name="send_montly_attendance_mail"),
     path(
         "api/assigned_classes",
         views.get_assigned_classes_to_teachers,

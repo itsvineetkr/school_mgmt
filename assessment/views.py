@@ -8,6 +8,7 @@ from rest_framework import status
 from assessment.utils import AssessmentGenerator, calculate_score
 from schools.models import RegisteredSchool, AccountAffiliation, ClassAssessment
 from django.http import HttpResponse
+from schools.utils import send_assessment_score_email
 import json
 
 
@@ -431,6 +432,10 @@ def submit_assessment(request):
             obtained_score=obtained_score,
             remark=remark,
         ).save()
+        # Send email notification
+
+        send_assessment_score_email(submission)
+
         return Response(
             {"message": "Assessment submitted successfully"},
             status=status.HTTP_201_CREATED,

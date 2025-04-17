@@ -5,7 +5,8 @@ from rest_framework import status
 from accounts.models import CustomUser
 from schools.models import ClassAssessment, AccountAffiliation, Event
 from schools.validation import validate_section, validate_standard
-from schools.utils import create_default_password
+from schools.utils import create_default_password, send_event_email
+from schools.tasks import send_attendance_email
 import pandas as pd
 import json
 from datetime import datetime
@@ -798,6 +799,8 @@ def add_event(request):
     )
     event.save()
 
+    send_event_email(event)
+
     return Response({"status": 200, "message": "Event added successfully"})
 
 
@@ -1273,3 +1276,19 @@ def get_all_teachers(request):
         return Response({"status": 200, "data": list(teachers.values())})
     except AccountAffiliation.DoesNotExist:
         return Response({"status": 404, "message": "School not found"}, status=404)
+
+
+@api_view(["POST"])
+def send_montly_attendance_mail(request):
+    if request.user.is_anonymous:
+        return Response({"status": 401, "message": "Unauthorized"}, status=401)
+    
+    if request.user.role != "principal":
+        return Response({"status": 401, "message": "Unauthorized"}, status=401)
+    try:
+        send_attendance_email()
+    except Exception as e:
+        return Response(
+            {"status": 500, "message": f"Error sending email: {str(e)}"}, status=500
+        )
+    return Response({"status": 200, "message": "Monthly attendance email sent successfully"})

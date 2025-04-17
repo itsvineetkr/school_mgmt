@@ -668,3 +668,21 @@ document.querySelector('[name="view_type"]').addEventListener('change', function
     const studentFilters = document.querySelector('.student-filters');
     studentFilters.style.display = this.value === 'students' ? 'flex' : 'none';
 });
+
+// Send Monthly Attendance Email Handler
+document.querySelector('.sb-send-attendance-mail').addEventListener('click', async () => {
+    try {
+        const response = await fetch('api/send_montly_attendance_mail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            credentials: 'include'
+        })
+        await handleResponse(response)
+        alert('Monthly attendance email sent successfully')
+    } catch (error) {
+        console.error('Error:', error)
+    }
+})
