@@ -11,6 +11,29 @@ from django.http import HttpResponse
 import json
 
 
+def take_assessment(request, assessment_id):
+    if request.user.is_anonymous or request.user.role != "student":
+        return render(request, "error.html", {"message": "Authentication required."})
+
+    try:
+        school = AccountAffiliation.objects.get(account=request.user).school
+    except AccountAffiliation.DoesNotExist:
+        return HttpResponse("School affiliation not found.", status=404)
+
+    try:
+        assessment = AssessmentStore.objects.get(id=assessment_id, school=school)
+        assessment.assessment = json.dumps(assessment.assessment)
+    except AssessmentStore.DoesNotExist:
+        return HttpResponse("No such assessment found!", status=404)
+
+    # Render the assessment taking page with the assessment details
+    return render(
+        request,
+        "assessment/take_assessment.html",
+        {"assessment": assessment, "student": request.user},
+    )
+
+
 @api_view(["POST"])
 def generate_assessment(request):
     if request.user.is_anonymous or not request.user.role == "teacher":
@@ -350,29 +373,6 @@ def delete_assessment(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def take_assessment(request, assessment_id):
-    if request.user.is_anonymous or request.user.role != "student":
-        return render(request, "error.html", {"message": "Authentication required."})
-
-    try:
-        school = AccountAffiliation.objects.get(account=request.user).school
-    except AccountAffiliation.DoesNotExist:
-        return HttpResponse("School affiliation not found.", status=404)
-
-    try:
-        assessment = AssessmentStore.objects.get(id=assessment_id, school=school)
-        assessment.assessment = json.dumps(assessment.assessment)
-    except AssessmentStore.DoesNotExist:
-        return HttpResponse("No such assessment found!", status=404)
-
-    # Render the assessment taking page with the assessment details
-    return render(
-        request,
-        "assessment/take_assessment.html",
-        {"assessment": assessment, "student": request.user},
-    )
-
-
 @api_view(["POST"])
 def submit_assessment(request):
     if request.user.is_anonymous or request.user.role != "student":
@@ -496,3 +496,25 @@ def get_assessment_submissions(request):
         )
 
     return Response(results, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def get_assessment_list(request):
+    if request.user.is_anonymous or request.user.role != "teacher":
+        return Response(
+            {"error": "Authentication required."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    try:
+        school = AccountAffiliation.objects.get(account=request.user).school
+    except AccountAffiliation.DoesNotExist:
+        return Response(
+            {"error": "School affiliation not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    assessments = AssessmentStore.objects.filter(
+        school=school, teacher=request.user
+    ).values()
+    return Response(assessments, status=status.HTTP_200_OK)

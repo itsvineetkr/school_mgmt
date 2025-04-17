@@ -14,6 +14,11 @@ urlpatterns = [
         name="get_assessment_submissions",
     ),
     path(
+        "api/get_assessment_list",
+        views.get_assessment_list,
+        name="get_assessment_list",
+    ),
+    path(
         "take-assessment/<int:assessment_id>/",
         views.take_assessment,
         name="take_assessment",

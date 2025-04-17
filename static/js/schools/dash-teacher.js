@@ -625,7 +625,6 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 })
 
 
-
 document.querySelector('.section-attendance-summary form').addEventListener('submit', async function (event) {
 	event.preventDefault();
 	const form = event.target;
@@ -703,11 +702,13 @@ const confirmButtonComp = assessmentFormComp.querySelector('.confirm-assessment-
 let assessmentDataComp = null;
 let assessmentDetailsComp = null;
 
+
 document.querySelector('.assessment-info-comp').style.display = 'none';
 // Prevent the form from submitting on Enter key or general submission
 assessmentFormComp.addEventListener('submit', function(event) {
 	event.preventDefault();
 });
+
 
 // Add click handler specifically for the generate button
 generateButtonComp.addEventListener('click', async function(event) {
@@ -772,6 +773,7 @@ generateButtonComp.addEventListener('click', async function(event) {
 		alert('Error generating assessment: ' + (error.message || 'Unknown error'));
 	}
 });
+
 
 // Add click handler specifically for the confirm button
 confirmButtonComp.addEventListener('click', async function(event) {
@@ -839,5 +841,99 @@ confirmButtonComp.addEventListener('click', async function(event) {
 	}
 });
 
+
 // Hide confirm button initially
 confirmButtonComp.style.display = 'none';
+
+
+document.querySelector('.sb-see-assessment-results').addEventListener('click', async function() {
+	try {
+		const data = await fetch('/assessment/api/get_assessment_list', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': getCsrfToken()
+			}
+		}).then(handleResponse);
+
+		const select = document.querySelector('select[name="assessment-id"]');
+		data.forEach(assessment => {
+			const option = document.createElement('option');
+			option.value = assessment.id;
+			option.textContent = assessment.name;
+			select.appendChild(option);
+		});
+	} catch (error) {
+		console.error('Error:', error);
+	}
+});
+
+
+document.querySelector('.section-see-assessment-results form').addEventListener('submit', async function(event) {
+	event.preventDefault();
+	const assessmentId = this.querySelector('select[name="assessment-id"]').value;
+	
+	if (!assessmentId) {
+		alert('Please select an assessment');
+		return;
+	}
+
+	try {
+		const data = await fetch(`/assessment/api/get_assessment_submissions?assessment_id=${assessmentId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': getCsrfToken()
+			}
+		}).then(handleResponse);
+
+		const container = document.querySelector('.section-see-assessment-results .students-list');
+		container.innerHTML = '';
+
+		const table = document.createElement('table');
+		const thead = document.createElement('thead');
+		const headerRow = document.createElement('tr');
+		['Student Name', 'Email', 'Status', 'Score', 'Maximum Score', 'Remarks'].forEach(header => {
+			const th = document.createElement('th');
+			th.textContent = header;
+			headerRow.appendChild(th);
+		});
+		thead.appendChild(headerRow);
+		table.appendChild(thead);
+
+		const tbody = document.createElement('tbody');
+		data.forEach(result => {
+			const row = document.createElement('tr');
+			
+			const cells = [
+				result.student_name,
+				result.student_email,
+				result.status,
+				result.score || '-',
+				result.max_score || '-',
+				result.remark || '-'
+			];
+
+			// Add styles to each cell, with special handling for remarks
+			row.childNodes.forEach((td, index) => {
+				if (index === 5) { // Remarks column
+					td.style.width = '300px';
+					td.style.fontSize = '0.9em';
+				}
+			});
+
+			cells.forEach(cellText => {
+				const td = document.createElement('td');
+				td.textContent = cellText;
+				row.appendChild(td);
+			});
+
+			tbody.appendChild(row);
+		});
+
+		table.appendChild(tbody);
+		container.appendChild(table);
+	} catch (error) {
+		console.error('Error:', error);
+	}
+});

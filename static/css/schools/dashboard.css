@@ -395,6 +395,15 @@ body a {
     min-width: 150px;
 }
 
+.assessment-result-table td:nth-child(6) {
+    min-width: 320px;
+    font-size: 12px;
+    color: #ffffff9e;
+}
+
+.assessment-result-table td:nth-child(1) {
+    min-width: 220px;
+}
 
 @media (max-width: 650px) {
 

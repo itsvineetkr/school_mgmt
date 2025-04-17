@@ -8,6 +8,7 @@
 {% block sidebarButtons %}
 <div class="sidebar-button" data-target="section-make-assessment">Make Assessment</div>
 <div class="sidebar-button" data-target="section-make-competition-assessment">Make Competition Assessment</div>
+<div class="sidebar-button sb-see-assessment-results" data-target="section-see-assessment-results">See Assessment Results</div>
 <div class="sidebar-button sb-see-assessment" data-target="section-see-assessment">See Assessments</div>
 <div class="sidebar-button sb-see-assessment-comp" data-target="section-see-assessment-comp">See Competition Assessments</div>
 <div class="sidebar-button" data-target="section-fee-status-update">Fee Status Update</div>
@@ -135,6 +136,21 @@
 	</div>
 	<div id="preview-assessment-comp">
 
+	</div>
+</div>
+
+<div class="content-section section-see-assessment-results">
+	<div class="content-section-title">See Assessment Results</div>
+	<form>
+		{% csrf_token %}
+		<select name="assessment-id">
+			<option value="">Select Assessment</option>
+			
+		</select>
+		<button type="submit">Get Results</button>
+	</form>
+	<div class="students-list assessment-result-table">
+		<!-- Assessment results will be populated here -->
 	</div>
 </div>
 
