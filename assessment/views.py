@@ -261,6 +261,19 @@ def get_assessments(request):
                     "OLYMPIAD",
                 ],
             )
+            submitted_assessments = AssessmentSubmission.objects.filter(
+                student=request.user,
+                assessment__competition__in=[
+                    "CUET",
+                    "JEE_MAINS",
+                    "JEE_ADVANCE",
+                    "NEET",
+                    "NDA",
+                    "CLAT",
+                    "OLYMPIAD",
+                ],
+            )
+
         else:
             assessments = AssessmentStore.objects.filter(
                 school=school,
@@ -268,10 +281,10 @@ def get_assessments(request):
                 section=section,
                 competition=competition,
             )
-        submitted_assessments = AssessmentSubmission.objects.filter(
-            student=request.user,
-            assessment__competition=competition,
-        )
+            submitted_assessments = AssessmentSubmission.objects.filter(
+                student=request.user,
+                assessment__competition=competition,
+            )
 
         assessments_list = []
 
@@ -419,7 +432,6 @@ def submit_assessment(request):
     max_score, obtained_score, remarks = calculate_score(
         correct_assessment.assessment, given_assessment
     )
-
     remark = "\n".join(remarks) if remarks else ""
 
     try:
@@ -431,9 +443,8 @@ def submit_assessment(request):
             max_score=max_score,
             obtained_score=obtained_score,
             remark=remark,
-        ).save()
-        # Send email notification
-
+        )
+        submission.save()
         send_assessment_score_email(submission)
 
         return Response(
@@ -476,7 +487,10 @@ def get_assessment_submissions(request):
 
     # Get all students in the class
     students = ClassAssessment.objects.filter(
-        school=school, standard=assessment.standard, section=assessment.section
+        school=school,
+        standard=assessment.standard,
+        section=assessment.section,
+        role="student",
     ).select_related("account")
 
     submissions = AssessmentSubmission.objects.filter(

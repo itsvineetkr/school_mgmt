@@ -51,27 +51,40 @@ def send_otp_email(email, otp, name):
 
 def send_assessment_score_email(assessmentSubmission):
     # Extract required information from assessmentSubmission
-    student_name = assessmentSubmission.student.username
-    assessment_name = assessmentSubmission.assessment.name
-    assessment_subject = assessmentSubmission.assessment.subject
-    teacher_name = assessmentSubmission.assessment.teacher.username
-    submission_date = assessmentSubmission.submission_date
-    marks_obtained = assessmentSubmission.obtained_score
-    total_marks = assessmentSubmission.max_score
-    remarks = assessmentSubmission.remark
+    try:
+        student_name = assessmentSubmission.student.username
+        assessment_name = assessmentSubmission.assessment.name
 
-    recipient_email = assessmentSubmission.student.email
+        if assessmentSubmission.assessment.competition == "SCHOOL":
+            assessment_description = assessmentSubmission.assessment.description
+        else:
+            assessment_description = assessmentSubmission.assessment.competition
+        teacher_name = assessmentSubmission.assessment.teacher.username
+        submission_date = assessmentSubmission.submission_date
+        marks_obtained = assessmentSubmission.obtained_score
+        total_marks = assessmentSubmission.max_score
+        remarks = assessmentSubmission.remark if assessmentSubmission.remark != "" else "No Remarks"
+
+        recipient_email = assessmentSubmission.student.email
+
+    except Exception as e:
+        print(f"Error extracting information from assessmentSubmission: {e}")
+        
+    if recipient_email is None:
+        raise ValueError("Recipient email is None")
 
     context = {
         "studentName": student_name,
         "assessmentName": assessment_name,
-        "assessmentSubject": assessment_subject,
+        "assessmentDescription": assessment_description,
         "teacher": teacher_name,
         "submissionDate": submission_date,
         "marksObtained": marks_obtained,
         "totalMarks": total_marks,
         "remarks": remarks,
     }
+
+    print(context)
 
     html_content = render_to_string("mailTemplates/assessmentScore.html", context)
     text_content = strip_tags(html_content)

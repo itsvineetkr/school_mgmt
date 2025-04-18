@@ -789,6 +789,8 @@ def add_event(request):
             {"status": 400, "message": "Missing required fields"}, status=400
         )
 
+    date = datetime.strptime(date, "%Y-%m-%d").date()
+
     school = AccountAffiliation.objects.get(account=request.user).school
     event = Event(
         school=school,

@@ -210,6 +210,9 @@ document.querySelector('.sb-assessment-comp').addEventListener("click", async fu
                 <p>Section: ${assessment.section}</p>
                 <p>Duration: ${assessment.duration} minutes</p>
             `;
+            
+            console.log(assessment);
+
             if (assessment.status === 'submitted') {
                 assessmentDiv.innerHTML += `<button class="view-assessment ${assessment.id}">View Assessment</button>`;
                 assessmentDiv.innerHTML += `<button class="view-result ${assessment.id}">View Result</button>`;
