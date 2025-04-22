@@ -9,11 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configure the Gemini API
-API_KEY = os.getenv("GOOGLE_API_KEY")
-if not API_KEY:
-    raise ValueError("Missing GOOGLE_API_KEY in environment variables")
-
-genai.configure(api_key=API_KEY)
+genai.configure(api_key="AIzaSyBEyAmy9hpj3uebAj2ihpW3a2o9fgsGnhk")
 
 
 class AssessmentGenerator:
