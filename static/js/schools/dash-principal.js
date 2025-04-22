@@ -42,7 +42,7 @@ document.querySelector('.section-add-teacher form').addEventListener('submit', a
         email: formData.get('email'),
         phoneno: parseInt(formData.get('phone')),
         gender: formData.get('gender'),
-        dob: new Date().toISOString().split('T')[0] // Current date as default
+        dob: formData.get('dob') // Get DOB directly from the date input
     }
 
     try {
@@ -74,7 +74,7 @@ document.querySelector('.section-add-student form').addEventListener('submit', a
         gender: formData.get('gender'),
         standard: parseInt(formData.get('class')),
         section: formData.get('section'),
-        dob: new Date().toISOString().split('T')[0] // Current date as default
+        dob: formData.get('dob')
     }
 
     try {
@@ -395,7 +395,7 @@ document.querySelector('.section-fee-status form').addEventListener('submit', as
             body: JSON.stringify({ standard: standard, section: section })
         });
         const data = await handleResponse(response);
-        
+
         // Locate the fee status check section.
         const feeSection = document.querySelector('.section-fee-status');
         // Remove any existing table.
@@ -424,35 +424,35 @@ document.querySelector('.section-fee-status form').addEventListener('submit', as
         // Iterate over the result data
         data.data.forEach(item => {
             const row = document.createElement('tr');
-            
+
             const studentCell = document.createElement('td');
             studentCell.textContent = item.student || '';
             row.appendChild(studentCell);
-            
+
             const emailCell = document.createElement('td');
             emailCell.textContent = item.email || '';
             row.appendChild(emailCell);
-            
+
             const feeAmountCell = document.createElement('td');
             feeAmountCell.textContent = item.fee_amount || '';
             row.appendChild(feeAmountCell);
-            
+
             const dueDateCell = document.createElement('td');
             dueDateCell.textContent = item.due_date || '';
             row.appendChild(dueDateCell);
-            
+
             const paymentDateCell = document.createElement('td');
             paymentDateCell.textContent = item.payment_date || '';
             row.appendChild(paymentDateCell);
-            
+
             const statusCell = document.createElement('td');
             statusCell.textContent = item.status || '';
             row.appendChild(statusCell);
-            
+
             const messageCell = document.createElement('td');
             messageCell.textContent = item.message || '';
             row.appendChild(messageCell);
-            
+
             tbody.appendChild(row);
         });
         table.appendChild(tbody);
@@ -473,7 +473,7 @@ document.querySelector('.sb-unassign').addEventListener('click', async (e) => {
         const standardSelect = document.querySelector('.uc-standard-select')
 
         teacherSelect.innerHTML = '<option value="">Select Teacher</option>'
-        for (let teacher in data.data){
+        for (let teacher in data.data) {
             const option = document.createElement('option')
             option.value = teacher
             option.textContent = teacher
@@ -549,7 +549,7 @@ document.querySelector('.section-attendance-summary form').addEventListener('sub
             }
         });
         const data = await handleResponse(response);
-        
+
         const summarySection = document.querySelector('.attendance-summary');
         const existingTable = summarySection.querySelector('table');
         if (existingTable) {
@@ -560,7 +560,7 @@ document.querySelector('.section-attendance-summary form').addEventListener('sub
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         const headers = ['Student Name', 'Email', 'Present Days', 'Absent Days'];
-        
+
         headers.forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -572,23 +572,23 @@ document.querySelector('.section-attendance-summary form').addEventListener('sub
         const tbody = document.createElement('tbody');
         data.data.forEach(item => {
             const row = document.createElement('tr');
-            
+
             const nameCell = document.createElement('td');
             nameCell.textContent = item.student_name;
             row.appendChild(nameCell);
-            
+
             const emailCell = document.createElement('td');
             emailCell.textContent = item.email;
             row.appendChild(emailCell);
-            
+
             const presentCell = document.createElement('td');
             presentCell.textContent = item.present_days;
             row.appendChild(presentCell);
-            
+
             const absentCell = document.createElement('td');
             absentCell.textContent = item.absent_days;
             row.appendChild(absentCell);
-            
+
             tbody.appendChild(row);
         });
         table.appendChild(tbody);
@@ -607,7 +607,7 @@ document.querySelector('.section-view-all form').addEventListener('submit', asyn
     const section = form.querySelector('[name="section"]')?.value || '';
 
     try {
-        let url = viewType === 'students' 
+        let url = viewType === 'students'
             ? `api/get_all_students?standard=${standard}&section=${section}`
             : 'api/get_all_teachers';
 
@@ -619,19 +619,19 @@ document.querySelector('.section-view-all form').addEventListener('submit', asyn
             }
         });
         const data = await handleResponse(response);
-        
+
         const resultsSection = document.querySelector('.results-list');
         resultsSection.innerHTML = '';
 
         const table = document.createElement('table');
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
-        
+
         // Define headers based on view type
-        const headers = viewType === 'students' 
+        const headers = viewType === 'students'
             ? ['Name', 'Email', 'Phone', 'Gender', 'DOB', 'Class', 'Section']
-            : ['Name', 'Email', 'Phone', 'Gender', 'DOB'];
-        
+            : ['Name', 'Email', 'Phone', 'Gender', 'DOB', 'Assigned Classes'];
+
         headers.forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -643,17 +643,21 @@ document.querySelector('.section-view-all form').addEventListener('submit', asyn
         const tbody = document.createElement('tbody');
         data.data.forEach(item => {
             const row = document.createElement('tr');
-            
-            const cells = viewType === 'students' 
+
+            console.log(item)
+
+
+            const cells = viewType === 'students'
                 ? [item.username, item.email, item.phoneno, item.gender, item.dob, item.standard, item.section]
-                : [item.username, item.email, item.phoneno, item.gender, item.dob];
-            
+                : [item.username, item.email, item.phoneno, item.gender, item.dob, item.assigned_classes.join(',  ')];
+
+
             cells.forEach(cellText => {
                 const td = document.createElement('td');
                 td.textContent = cellText || '';
                 row.appendChild(td);
             });
-            
+
             tbody.appendChild(row);
         });
         table.appendChild(tbody);
@@ -664,7 +668,7 @@ document.querySelector('.section-view-all form').addEventListener('submit', asyn
 });
 
 // Show/hide student filters based on view type selection
-document.querySelector('[name="view_type"]').addEventListener('change', function() {
+document.querySelector('[name="view_type"]').addEventListener('change', function () {
     const studentFilters = document.querySelector('.student-filters');
     studentFilters.style.display = this.value === 'students' ? 'flex' : 'none';
 });

@@ -23,7 +23,7 @@
 	<form method="post">
 		{% csrf_token %}
 		<input type="text" name="assessment_name" placeholder="Assessment Name" />
-		<textarea name="description" placeholder="What is the assessment? Type the topics or give some elaboration."></textarea>
+		<textarea name="description" placeholder="( Subject / chapter name / Board)"></textarea>
         <select name="standard">
 			<option value="">Select Class</option>
             {% for standard, section in standards %}
@@ -34,7 +34,7 @@
 			<label>Due Date:</label>
 			<input type="date" name="due_date" />
 		</div>
-		<input type="number" name="max_time" placeholder="Max Time (minutes)" min="0" step="30"/>
+		<input type="number" name="max_time" placeholder="Max Time (minutes)" min="45" step="30"/>
 		<select name="question_types">
 			<option value="">Select Question Type</option>
 			<option value="MCQ">MCQ</option>
@@ -43,11 +43,12 @@
 		</select>
 		<select name="difficulty">
 			<option value="">Select Difficulty</option>
+			<option value="expert">Expert</option>
 			<option value="hard">Hard</option>
 			<option value="moderate">Moderate</option>
-			<option value="Mix">Easy</option>
+			<option value="easy">Easy</option>
 		</select>
-		<input type="number" name="num_questions" placeholder="Number of Questions" min="1" />
+		<input type="number" name="num_questions" placeholder="Number of Questions (max:30)" min="1" max="30"/>
 		<button type="submit" class="generate-assessment-button">Generate</button>
 		<div class="preview">
 			<div class="assessment-container">
@@ -85,12 +86,17 @@
 			<option value="OLYMPIAD">Olympiad</option>
 		</select>
 		<input type="text" name="subject" placeholder="Subject" />
+		<div class="input-radio">
+			<label style="min-width: 150px;">Full Syllabus:</label>
+			Yes<input type="radio" name="fullSyllabus" value="y" />No<input type="radio" name="fullSyllabus"
+				value="n" checked />
+		</div>
 		<input type="text" name="topic" placeholder="Topic" />
 		<div class="input-date">
 			<label>Due Date:</label>
 			<input type="date" name="due_date" />
 		</div>
-		<input type="number" name="max_time" placeholder="Max Time (minutes)" min="0" step="30"/>
+		<input type="number" name="max_time" placeholder="Max Time (minutes)" min="45" step="30"/>
 		<select name="question_types">
 			<option value="">Select Question Type</option>
 			<option value="MCQ">MCQ</option>
@@ -99,11 +105,12 @@
 		</select>
 		<select name="difficulty">
 			<option value="">Select Difficulty</option>
+			<option value="expert">Expert</option>
 			<option value="hard">Hard</option>
 			<option value="moderate">Moderate</option>
-			<option value="Mix">Easy</option>
+			<option value="easy">Easy</option>
 		</select>
-		<input type="number" name="num_questions" placeholder="Number of Questions" min="1" />
+		<input type="number" name="num_questions" placeholder="Number of Questions (max:30)" min="1" max="30"/>
 		<button type="submit" class="generate-assessment-button-comp">Generate</button>
 		<div class="preview">
 			<div class="assessment-container-comp">

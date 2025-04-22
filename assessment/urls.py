@@ -23,4 +23,24 @@ urlpatterns = [
         views.take_assessment,
         name="take_assessment",
     ),
+    path(
+        "api/save_assessment_student",
+        views.save_assessment_student,
+        name="save_assessment_student",
+    ),
+    path(
+        "api/generate_assessment_student",
+        views.generate_assessment_student,
+        name="generate_assessment_student",
+    ),
+    path(
+        "api/delete_assessment_student",
+        views.delete_assessment_student,
+        name="delete_assessment_student",
+    ),
+    path(
+        "api/get_assessments_student",
+        views.get_assessments_student,
+        name="get_assessments_student",
+    ),
 ]

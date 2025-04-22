@@ -19,7 +19,7 @@ def create_default_password(name: str, dob: str) -> str:
     name_part = name[0 : min(4, len(name))].upper()
     year_part = dob.split("-")[0]
     default_password = f"{name_part}{year_part}"
-
+    print(default_password)
     return default_password
 
 
@@ -63,13 +63,17 @@ def send_assessment_score_email(assessmentSubmission):
         submission_date = assessmentSubmission.submission_date
         marks_obtained = assessmentSubmission.obtained_score
         total_marks = assessmentSubmission.max_score
-        remarks = assessmentSubmission.remark if assessmentSubmission.remark != "" else "No Remarks"
+        remarks = (
+            assessmentSubmission.remark
+            if assessmentSubmission.remark != ""
+            else "No Remarks"
+        )
 
         recipient_email = assessmentSubmission.student.email
 
     except Exception as e:
         print(f"Error extracting information from assessmentSubmission: {e}")
-        
+
     if recipient_email is None:
         raise ValueError("Recipient email is None")
 

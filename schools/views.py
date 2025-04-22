@@ -18,6 +18,18 @@ def dashboard(request):
     if request.user.is_anonymous:
         return redirect("/")
 
+    if request.user.role == "student":
+        school = AccountAffiliation.objects.get(account=request.user).school
+
+        if school.uniqueSchoolCode == "adminSchool":
+            student = ClassAssessment.objects.get(account=request.user)
+            context = {
+                "student": student,
+                "user": request.user,
+                "school": school,
+            }
+            return render(request, "schools/dash-special-student.html", context=context)
+
     if request.user.role == "principal":
         context = {
             "user": request.user,
@@ -351,6 +363,7 @@ def add_teacher(request):
         dob=dob,
     )
     # Create password from first four letters of name (capitalized) + year of birth
+    print(dob)
     password = create_default_password(name, dob)
 
     teacherAccount.set_password(password)
@@ -1275,7 +1288,30 @@ def get_all_teachers(request):
             gender=F("account__gender"),
             dob=F("account__dob"),
         )
-        return Response({"status": 200, "data": list(teachers.values())})
+        # Get all class assignments for each teacher
+        teacher_data = []
+        for teacher in teachers:
+            classes = ClassAssessment.objects.filter(
+                school=school, account=teacher.account, role="teacher"
+            ).values_list("standard", "section")
+
+            # Format classes as "standard-section"
+            classes_formatted = [f"{c[0]}-{c[1]}" for c in classes]
+
+            teacher_dict = {
+                "username": teacher.username,
+                "email": teacher.email,
+                "phoneno": teacher.phoneno,
+                "gender": teacher.gender,
+                "dob": teacher.dob,
+                "assigned_classes": classes_formatted,
+            }
+
+            print(classes_formatted)
+            teacher_data.append(teacher_dict)
+
+        return Response({"status": 200, "data": teacher_data})
+
     except AccountAffiliation.DoesNotExist:
         return Response({"status": 404, "message": "School not found"}, status=404)
 
@@ -1284,7 +1320,7 @@ def get_all_teachers(request):
 def send_montly_attendance_mail(request):
     if request.user.is_anonymous:
         return Response({"status": 401, "message": "Unauthorized"}, status=401)
-    
+
     if request.user.role != "principal":
         return Response({"status": 401, "message": "Unauthorized"}, status=401)
     try:
@@ -1293,4 +1329,6 @@ def send_montly_attendance_mail(request):
         return Response(
             {"status": 500, "message": f"Error sending email: {str(e)}"}, status=500
         )
-    return Response({"status": 200, "message": "Monthly attendance email sent successfully"})
+    return Response(
+        {"status": 200, "message": "Monthly attendance email sent successfully"}
+    )

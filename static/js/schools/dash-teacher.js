@@ -107,35 +107,35 @@ document.querySelector('.section-fee-status-check form').addEventListener('submi
 		// Iterate over the result data
 		data.data.forEach(item => {
 			const row = document.createElement('tr');
-			
+
 			const studentCell = document.createElement('td');
 			studentCell.textContent = item.student || '';
 			row.appendChild(studentCell);
-			
+
 			const emailCell = document.createElement('td');
 			emailCell.textContent = item.email || '';
 			row.appendChild(emailCell);
-			
+
 			const feeAmountCell = document.createElement('td');
 			feeAmountCell.textContent = item.fee_amount || '';
 			row.appendChild(feeAmountCell);
-			
+
 			const dueDateCell = document.createElement('td');
 			dueDateCell.textContent = item.due_date || '';
 			row.appendChild(dueDateCell);
-			
+
 			const paymentDateCell = document.createElement('td');
 			paymentDateCell.textContent = item.payment_date || '';
 			row.appendChild(paymentDateCell);
-			
+
 			const statusCell = document.createElement('td');
 			statusCell.textContent = item.status || '';
 			row.appendChild(statusCell);
-			
+
 			const messageCell = document.createElement('td');
 			messageCell.textContent = item.message || '';
 			row.appendChild(messageCell);
-			
+
 			tbody.appendChild(row);
 		});
 		table.appendChild(tbody);
@@ -155,7 +155,7 @@ document.querySelector('.section-add-attendance form').addEventListener('submit'
 		return;
 	}
 	const [standard, section] = value.split('-');
-	
+
 	try {
 		const data = await fetch('api/fetch_class_data/', {
 			method: 'POST',
@@ -165,7 +165,7 @@ document.querySelector('.section-add-attendance form').addEventListener('submit'
 			},
 			body: JSON.stringify({ standard: Number(standard), section: section })
 		}).then(handleResponse);
-		
+
 		const studentsListDiv = form.querySelector('.students-list');
 		studentsListDiv.innerHTML = '';
 
@@ -253,7 +253,7 @@ document.querySelector('.section-add-attendance form').addEventListener('submit'
 				}
 
 				console.log('Attendance Data:', attendanceData);
-				
+
 				try {
 					const responseData = await fetch('api/add_attendance', {
 						method: 'POST',
@@ -263,7 +263,7 @@ document.querySelector('.section-add-attendance form').addEventListener('submit'
 						},
 						body: JSON.stringify(attendanceData)
 					}).then(handleResponse);
-					
+
 					console.log('Attendance added successfully:', responseData);
 					alert('Attendance submitted successfully');
 				} catch (error) {
@@ -276,7 +276,6 @@ document.querySelector('.section-add-attendance form').addEventListener('submit'
 	}
 });
 
-document.querySelector('.assessment-info').style.display = 'none';
 
 function renderQuestions(assessmentData, containerId, assessmentDetails, infoContainerId = '.assessment-info') {
 	const container = document.getElementById(containerId);
@@ -289,28 +288,28 @@ function renderQuestions(assessmentData, containerId, assessmentDetails, infoCon
 		assessmentInfo.innerHTML = '';
 		// Display assessment details
 		assessmentInfo.innerHTML = `
-			<h1>Assessment Preview</h1>
-			<h2>${assessmentDetails.assessment_name}</h2>
-			<p><strong>Description:</strong> ${assessmentDetails.assessment_description}</p>
-			<p><strong>Question Types:</strong> ${assessmentDetails.question_types}</p>
-			<p><strong>Duration:</strong> ${assessmentDetails.duration} minutes</p>
-			<p><strong>Standard:</strong> ${assessmentDetails.standard}</p>
-			<p><strong>Number of Questions:</strong> ${assessmentDetails.num_questions}</p>
+		<h1>Assessment Preview</h1>
+		<h2>${assessmentDetails.assessment_name}</h2>
+		<p><strong>Description:</strong> ${assessmentDetails.assessment_description}</p>
+		<p><strong>Question Types:</strong> ${assessmentDetails.question_types}</p>
+		<p><strong>Duration:</strong> ${assessmentDetails.duration} minutes</p>
+		<p><strong>Standard:</strong> ${assessmentDetails.standard}</p>
+		<p><strong>Number of Questions:</strong> ${assessmentDetails.num_questions}</p>
 		`;
 	}
 
 	assessmentData.forEach((question, index) => {
 		const questionElement = document.createElement('div');
 		questionElement.className = `question-card ${question['question-type'].toLowerCase()}-question`;
-		
+
 		let questionHTML = `
-			<div class="question-header">
-				<span>Question ${index + 1}</span>
-				<span class="question-type">${question['question-type']}</span>
-			</div>
-			<div class="question-text">${question.question}</div>
+		<div class="question-header">
+		<span>Question ${index + 1}</span>
+		<span class="question-type">${question['question-type']}</span>
+		</div>
+		<div class="question-text">${question.question}</div>
 		`;
-		
+
 		if (question['question-type'] === 'MCQ') {
 			questionHTML += `<ul class="options">`;
 			question.options.forEach((option, optIndex) => {
@@ -320,12 +319,13 @@ function renderQuestions(assessmentData, containerId, assessmentDetails, infoCon
 		} else if (question['question-type'] === 'Written') {
 			questionHTML += `<div class="answer-area">Answer area will be available in test mode</div>`;
 		}
-		
+
 		questionElement.innerHTML = questionHTML;
 		container.appendChild(questionElement);
 	});
 }
 
+document.querySelector('.assessment-info').style.display = 'none';
 document.querySelector('.confirm-assessment-button').style.display = 'none';
 document.querySelector('.generate-assessment-button').innerHTML = 'Generate';
 
@@ -338,12 +338,12 @@ let assessmentData = null;
 let assessmentDetails = null;
 
 // Prevent the form from submitting on Enter key or general submission
-assessmentForm.addEventListener('submit', function(event) {
+assessmentForm.addEventListener('submit', function (event) {
 	event.preventDefault();
 });
 
 // Add click handler specifically for the generate button
-generateButton.addEventListener('click', async function(event) {
+generateButton.addEventListener('click', async function (event) {
 	event.preventDefault();
 	console.log("hua bhai kuch to")
 	// Disable button and show loading animation
@@ -354,7 +354,7 @@ generateButton.addEventListener('click', async function(event) {
 		dotCount = (dotCount + 1) % 4;
 		generateButton.innerHTML = loadingText + ".".repeat(dotCount);
 	}, 400);
-	
+
 	const assessmentName = assessmentForm.querySelector('[name="assessment_name"]').value;
 	let description = assessmentForm.querySelector('[name="description"]').value;
 	const standard = assessmentForm.querySelector('[name="standard"]').value;
@@ -382,11 +382,11 @@ generateButton.addEventListener('click', async function(event) {
 				duration: maxTime,
 			})
 		}).then(handleResponse);
-		
+
 		// Clear loading animation
 		clearInterval(loadingInterval);
 		generateButton.disabled = false;
-		
+
 		assessmentData = data.assessment;
 		assessmentDetails = data.details;
 		renderQuestions(assessmentData, 'questions-container', assessmentDetails);
@@ -403,15 +403,15 @@ generateButton.addEventListener('click', async function(event) {
 });
 
 // Add click handler specifically for the confirm button
-confirmButton.addEventListener('click', async function(event) {
+confirmButton.addEventListener('click', async function (event) {
 	event.preventDefault();
-	
+
 	// Only proceed if we have assessment data
 	if (!assessmentData) {
 		alert('Please generate an assessment first');
 		return;
 	}
-	
+
 	// Disable button and show loading animation
 	confirmButton.disabled = true;
 	let loadingText = "Saving";
@@ -420,7 +420,7 @@ confirmButton.addEventListener('click', async function(event) {
 		dotCount = (dotCount + 1) % 4;
 		confirmButton.innerHTML = loadingText + ".".repeat(dotCount);
 	}, 400);
-	
+
 	const assessmentName = assessmentForm.querySelector('[name="assessment_name"]').value;
 	const description = assessmentForm.querySelector('[name="description"]').value;
 	const standard = assessmentForm.querySelector('[name="standard"]').value;
@@ -444,7 +444,7 @@ confirmButton.addEventListener('click', async function(event) {
 				duration: maxTime
 			})
 		}).then(handleResponse);
-		
+
 		clearInterval(loadingInterval);
 		confirmButton.disabled = false;
 		confirmButton.innerHTML = 'Confirm';
@@ -462,7 +462,7 @@ confirmButton.addEventListener('click', async function(event) {
 // Hide confirm button initially
 confirmButton.style.display = 'none';
 
-document.querySelector('.sb-see-assessment').addEventListener("click", async function(){
+document.querySelector('.sb-see-assessment').addEventListener("click", async function () {
 	try {
 		const data = await fetch('/assessment/api/get_assessment', {
 			method: 'GET',
@@ -471,7 +471,7 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 				'X-CSRFToken': getCsrfToken()
 			}
 		}).then(handleResponse);
-		
+
 		if (data.length === 0) {
 			const container = document.querySelector('.see-assessment-container');
 			container.innerHTML = '<p>No assignments present</p>';
@@ -496,7 +496,7 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 			container.appendChild(assessmentDiv);
 
 			document.querySelectorAll('.delete-assessment').forEach(button => {
-				button.addEventListener('click', async function() {
+				button.addEventListener('click', async function () {
 					const assessmentId = this.classList[1];
 					try {
 						const responseData = await fetch('/assessment/api/delete_assessment', {
@@ -507,7 +507,7 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 							},
 							body: JSON.stringify({ id: assessmentId })
 						}).then(handleResponse);
-						
+
 						alert('Assessment deleted successfully');
 						window.location.reload();
 					} catch (error) {
@@ -515,19 +515,19 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 					}
 				});
 			});
-	
+
 			document.querySelectorAll('.view-assessment').forEach(button => {
-				button.addEventListener('click', function() {
+				button.addEventListener('click', function () {
 					const assessmentId = this.classList[1];
 					const assessmentObj = data.find(obj => String(obj.id) === assessmentId);
-					
+
 					if (assessmentObj) {
 						const previewAssessment = document.querySelector('#preview-assessment');
 						renderQuestions(assessmentObj.assessment, 'preview-assessment', null);
 						previewAssessment.innerHTML = `<h1>Assessment Preview: ${assessmentObj.name}</h1>` + previewAssessment.innerHTML;
 					} else {
 						alert('Assessment not found');
-					}	
+					}
 				});
 			});
 		});
@@ -537,7 +537,7 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 })
 
 
-document.querySelector('.sb-see-assessment').addEventListener("click", async function(){
+document.querySelector('.sb-see-assessment').addEventListener("click", async function () {
 	try {
 		const data = await fetch('/assessment/api/get_assessment?competition=ALL_COMPETITIONS', {
 			method: 'GET',
@@ -546,7 +546,7 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 				'X-CSRFToken': getCsrfToken()
 			}
 		}).then(handleResponse);
-		
+
 		if (data.length === 0) {
 			const container = document.querySelector('.see-assessment-container-comp');
 			container.innerHTML = '<p>No assignments present</p>';
@@ -559,20 +559,19 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 			assessmentDiv.className = 'assessment-card';
 			assessmentDiv.innerHTML = `
 				<div class="assessment-title">${assessment.name}</div>
-				<p>${
-                    (() => {
-                        const desc = assessment.description;
-                        const matches = desc.match(/exam (.*?) in (.*?) on the topic (.*?)\. The difficulty level.*?(easy|medium|hard)/i);
-                        if (!matches) return assessment.description.length > 70 ? 
-                            assessment.description.substring(0, 70) + '...' : 
-                            assessment.description;
-                        
-                        return `Competition: ${matches[1]}<br>
+				<p>${(() => {
+					const desc = assessment.description;
+					const matches = desc.match(/exam (.*?) in (.*?) on the topic (.*?)\. The difficulty level.*?(easy|medium|hard)/i);
+					if (!matches) return assessment.description.length > 70 ?
+						assessment.description.substring(0, 70) + '...' :
+						assessment.description;
+
+					return `Competition: ${matches[1]}<br>
                                 Subject: ${matches[2]}<br>
                                 Topic: ${matches[3]}<br>
                                 Difficulty: ${matches[4].charAt(0).toUpperCase() + matches[4].slice(1)}`;
-                    })()
-                }</p>
+				})()
+				}</p>
 				<p class="assessment-id">Assessment Id: ${assessment.id}</p>
 				<p>Due Date: ${assessment.due_date}</p>
 				<p>Standard: ${assessment.standard}</p>
@@ -584,7 +583,7 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 			container.appendChild(assessmentDiv);
 
 			document.querySelectorAll('.see-assessment-container-comp .delete-assessment').forEach(button => {
-				button.addEventListener('click', async function() {
+				button.addEventListener('click', async function () {
 					const assessmentId = this.classList[1];
 					try {
 						const responseData = await fetch('/assessment/api/delete_assessment', {
@@ -595,7 +594,7 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 							},
 							body: JSON.stringify({ id: assessmentId })
 						}).then(handleResponse);
-						
+
 						alert('Assessment deleted successfully');
 						window.location.reload();
 					} catch (error) {
@@ -603,19 +602,19 @@ document.querySelector('.sb-see-assessment').addEventListener("click", async fun
 					}
 				});
 			});
-	
+
 			document.querySelectorAll('.see-assessment-container-comp .view-assessment').forEach(button => {
-				button.addEventListener('click', function() {
+				button.addEventListener('click', function () {
 					const assessmentId = this.classList[1];
 					const assessmentObj = data.find(obj => String(obj.id) === assessmentId);
-					
+
 					if (assessmentObj) {
 						const previewAssessment = document.querySelector('#preview-assessment-comp');
 						renderQuestions(assessmentObj.assessment, 'preview-assessment-comp', null);
 						previewAssessment.innerHTML = `<h1>Assessment Preview: ${assessmentObj.name}</h1>` + previewAssessment.innerHTML;
 					} else {
 						alert('Assessment not found');
-					}	
+					}
 				});
 			});
 		});
@@ -641,7 +640,7 @@ document.querySelector('.section-attendance-summary form').addEventListener('sub
 				'X-CSRFToken': getCsrfToken()
 			}
 		}).then(handleResponse);
-		
+
 		const summarySection = document.querySelector('.attendance-summary');
 		const existingTable = summarySection.querySelector('table');
 		if (existingTable) {
@@ -652,7 +651,7 @@ document.querySelector('.section-attendance-summary form').addEventListener('sub
 		const thead = document.createElement('thead');
 		const headerRow = document.createElement('tr');
 		const headers = ['Student Name', 'Email', 'Present Days', 'Absent Days'];
-		
+
 		headers.forEach(headerText => {
 			const th = document.createElement('th');
 			th.textContent = headerText;
@@ -664,23 +663,23 @@ document.querySelector('.section-attendance-summary form').addEventListener('sub
 		const tbody = document.createElement('tbody');
 		data.data.forEach(item => {
 			const row = document.createElement('tr');
-			
+
 			const nameCell = document.createElement('td');
 			nameCell.textContent = item.student_name;
 			row.appendChild(nameCell);
-			
+
 			const emailCell = document.createElement('td');
 			emailCell.textContent = item.email;
 			row.appendChild(emailCell);
-			
+
 			const presentCell = document.createElement('td');
 			presentCell.textContent = item.present_days;
 			row.appendChild(presentCell);
-			
+
 			const absentCell = document.createElement('td');
 			absentCell.textContent = item.absent_days;
 			row.appendChild(absentCell);
-			
+
 			tbody.appendChild(row);
 		});
 		table.appendChild(tbody);
@@ -690,6 +689,19 @@ document.querySelector('.section-attendance-summary form').addEventListener('sub
 	}
 });
 
+// Add event listeners for fullSyllabus radio buttons
+document.querySelectorAll('input[name="fullSyllabus"]').forEach(radio => {
+	radio.addEventListener('change', function () {
+		const topicInput = document.querySelector('input[name="topic"]');
+		if (this.value === 'y') {
+			topicInput.style.display = 'none';
+			topicInput.value = 'Full Syllabus';
+		} else {
+			topicInput.style.display = 'block';
+			topicInput.value = '';
+		}
+	});
+});
 
 document.querySelector('.confirm-assessment-button-comp').style.display = 'none';
 document.querySelector('.generate-assessment-button-comp').innerHTML = 'Generate';
@@ -705,15 +717,15 @@ let assessmentDetailsComp = null;
 
 document.querySelector('.assessment-info-comp').style.display = 'none';
 // Prevent the form from submitting on Enter key or general submission
-assessmentFormComp.addEventListener('submit', function(event) {
+assessmentFormComp.addEventListener('submit', function (event) {
 	event.preventDefault();
 });
 
 
 // Add click handler specifically for the generate button
-generateButtonComp.addEventListener('click', async function(event) {
+generateButtonComp.addEventListener('click', async function (event) {
 	event.preventDefault();
-	
+
 	// Disable button and show loading animation
 	generateButtonComp.disabled = true;
 	let loadingText = "Generating";
@@ -722,10 +734,11 @@ generateButtonComp.addEventListener('click', async function(event) {
 		dotCount = (dotCount + 1) % 4;
 		generateButtonComp.innerHTML = loadingText + ".".repeat(dotCount);
 	}, 400);
-	
+
 	const assessmentName = assessmentFormComp.querySelector('[name="assessment_name"]').value;
 	const competitionType = assessmentFormComp.querySelector('[name="competition_type"]').value;
 	const subject = assessmentFormComp.querySelector('[name="subject"]').value;
+	const fullSyllabus = assessmentFormComp.querySelector('input[name="fullSyllabus"]:checked').value;
 	const topic = assessmentFormComp.querySelector('[name="topic"]').value;
 	const standard = assessmentFormComp.querySelector('[name="standard"]').value;
 	const dueDate = assessmentFormComp.querySelector('[name="due_date"]').value;
@@ -733,9 +746,14 @@ generateButtonComp.addEventListener('click', async function(event) {
 	const difficulty = assessmentFormComp.querySelector('[name="difficulty"]').value;
 	const questionTypes = assessmentFormComp.querySelector('[name="question_types"]').value;
 	const numQuestions = assessmentFormComp.querySelector('[name="num_questions"]').value;
-
-	let description = `The assessment is for Indian competitive exam ${competitionType} in ${subject} on the topic ${topic}. The difficulty level of the questions should be ${difficulty}.`;
-	description += "\n" + "Please create good and correct assessment, only add questions you are sure of and those which you yourself can answer.";
+	let description = ""
+	if (fullSyllabus === 'n') {
+		description = `The assessment is for Indian competitive exam ${competitionType} for subject ${subject} on the topic ${topic}. The difficulty level of the questions should be ${difficulty}.`;
+		description += "\n" + "Please create good and correct assessment, only add questions you are sure of and those which you yourself can answer.";
+	} else {
+		description = `The assessment is for Indian competitive exam ${competitionType} for subject ${subject} consisting of full syllabus (having most of the topics from whole general syllabus). The difficulty level of the questions should be ${difficulty}.`;
+		description += "\n" + "Please create good and correct assessment, only add questions you are sure of and those which you yourself can answer.";
+	}
 
 	try {
 		const data = await fetch('/assessment/api/generate', {
@@ -753,11 +771,11 @@ generateButtonComp.addEventListener('click', async function(event) {
 				duration: maxTime,
 			})
 		}).then(handleResponse);
-		
+
 		// Clear loading animation
 		clearInterval(loadingInterval);
 		generateButtonComp.disabled = false;
-		
+
 		assessmentDataComp = data.assessment;
 		assessmentDetails = data.details;
 		assessmentDetails.assessment_description = assessmentDetails.assessment_description.split('Please create good and correct assessment, only add questions you')[0];
@@ -776,15 +794,15 @@ generateButtonComp.addEventListener('click', async function(event) {
 
 
 // Add click handler specifically for the confirm button
-confirmButtonComp.addEventListener('click', async function(event) {
+confirmButtonComp.addEventListener('click', async function (event) {
 	event.preventDefault();
-	
+
 	// Only proceed if we have assessment data
 	if (!assessmentDataComp) {
 		alert('Please generate an assessment first');
 		return;
 	}
-	
+
 	// Disable button and show loading animation
 	confirmButtonComp.disabled = true;
 	let loadingText = "Saving";
@@ -793,10 +811,11 @@ confirmButtonComp.addEventListener('click', async function(event) {
 		dotCount = (dotCount + 1) % 4;
 		confirmButtonComp.innerHTML = loadingText + ".".repeat(dotCount);
 	}, 400);
-	
+
 	const assessmentName = assessmentFormComp.querySelector('[name="assessment_name"]').value;
 	const competitionType = assessmentFormComp.querySelector('[name="competition_type"]').value;
 	const subject = assessmentFormComp.querySelector('[name="subject"]').value;
+	const fullSyllabus = assessmentFormComp.querySelector('input[name="fullSyllabus"]:checked').value;
 	const topic = assessmentFormComp.querySelector('[name="topic"]').value;
 	const standard = assessmentFormComp.querySelector('[name="standard"]').value;
 	const dueDate = assessmentFormComp.querySelector('[name="due_date"]').value;
@@ -805,9 +824,15 @@ confirmButtonComp.addEventListener('click', async function(event) {
 	const questionTypes = assessmentFormComp.querySelector('[name="question_types"]').value;
 	const numQuestions = assessmentFormComp.querySelector('[name="num_questions"]').value;
 
-	let description = `The assessment is for Indian competitive exam ${competitionType} in ${subject} on the topic ${topic}. The difficulty level of the questions should be ${difficulty}.`;
-	description += "\n" + "Please create good and correct assessment, only add questions you are sure of and those which you yourself can answer.";
+	let description = ""
 
+	if (fullSyllabus === 'n') {
+		description = `The assessment is for Indian competitive exam ${competitionType} for subject ${subject} on the topic ${topic}. The difficulty level of the questions should be ${difficulty}.`;
+		description += "\n" + "Please create good and correct assessment, only add questions you are sure of and those which you yourself can answer.";
+	} else {
+		description = `The assessment is for Indian competitive exam ${competitionType} for subject ${subject} consisting of full syllabus (having most of the topics from whole general syllabus). The difficulty level of the questions should be ${difficulty}.`;
+		description += "\n" + "Please create good and correct assessment, only add questions you are sure of and those which you yourself can answer.";
+	}
 	try {
 		const data = await fetch('/assessment/api/save', {
 			method: 'POST',
@@ -826,7 +851,7 @@ confirmButtonComp.addEventListener('click', async function(event) {
 				duration: maxTime
 			})
 		}).then(handleResponse);
-		
+
 		clearInterval(loadingInterval);
 		confirmButtonComp.disabled = false;
 		confirmButtonComp.innerHTML = 'Confirm';
@@ -846,7 +871,7 @@ confirmButtonComp.addEventListener('click', async function(event) {
 confirmButtonComp.style.display = 'none';
 
 
-document.querySelector('.sb-see-assessment-results').addEventListener('click', async function() {
+document.querySelector('.sb-see-assessment-results').addEventListener('click', async function () {
 	try {
 		const data = await fetch('/assessment/api/get_assessment_list', {
 			method: 'GET',
@@ -869,10 +894,10 @@ document.querySelector('.sb-see-assessment-results').addEventListener('click', a
 });
 
 
-document.querySelector('.section-see-assessment-results form').addEventListener('submit', async function(event) {
+document.querySelector('.section-see-assessment-results form').addEventListener('submit', async function (event) {
 	event.preventDefault();
 	const assessmentId = this.querySelector('select[name="assessment-id"]').value;
-	
+
 	if (!assessmentId) {
 		alert('Please select an assessment');
 		return;
@@ -904,7 +929,7 @@ document.querySelector('.section-see-assessment-results form').addEventListener(
 		const tbody = document.createElement('tbody');
 		data.forEach(result => {
 			const row = document.createElement('tr');
-			
+
 			const cells = [
 				result.student_name,
 				result.student_email,

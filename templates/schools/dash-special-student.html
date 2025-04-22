@@ -1,0 +1,152 @@
+{% extends "schools/base.html" %}
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/assessment/preview.css' %}">
+{% endblock style %}
+
+{% block sidebarButtons %}
+    <div class="sidebar-button" data-target="section-make-assessment">Make Assessment</div>
+    <div class="sidebar-button" data-target="section-make-competition-assessment">Make Competition Assessment</div>
+    <div class="sidebar-button sb-assessment" data-target="section-assessment">Assessments</div>
+{% endblock sidebarButtons %}
+
+{% block content %}
+<div class="content-section section-make-assessment">
+	<div class="content-section-title">Make Assessment</div>
+	<form method="post">
+		{% csrf_token %}
+		<input type="text" name="assessment_name" placeholder="Assessment Name" />
+		<textarea name="description" placeholder="( Subject / chapter name / Board)"></textarea>
+		<div class="input-date">
+			<label>Due Date:</label>
+			<input type="date" name="due_date" />
+		</div>
+		<input type="number" name="max_time" placeholder="Max Time (minutes)" min="45" step="30"/>
+		<select name="question_types">
+			<option value="">Select Question Type</option>
+			<option value="MCQ">MCQ</option>
+			<option value="Written">Written</option>
+			<option value="Mix">Mix</option>
+		</select>
+		<select name="difficulty">
+			<option value="">Select Difficulty</option>
+			<option value="expert">Expert</option>
+			<option value="hard">Hard</option>
+			<option value="moderate">Moderate</option>
+			<option value="easy">Easy</option>
+		</select>
+		<input type="number" name="num_questions" placeholder="Number of Questions (max:30)" min="1" max="30"/>
+		<button type="submit" class="generate-assessment-button">Generate</button>
+		<div class="preview">
+			<div class="assessment-container">
+				<div class="assessment-info">
+				</div>
+				
+				<div id="questions-container">
+					<!-- Questions will be populated here -->
+				</div>
+			</div>
+		</div>
+		<button class="confirm-assessment-button">Confirm</button>
+	</form>
+</div>
+
+<div class="content-section section-make-competition-assessment">
+	<div class="content-section-title">Make Competition Assessment</div>
+	<form method="post">
+		{% csrf_token %}
+		<input type="text" name="assessment_name" placeholder="Assessment Name" />
+		<select name="competition_type">
+			<option value="">Select Competition Type</option>
+			<option value="CUET">CUET</option>
+			<option value="JEE_MAINS">JEE Mains</option>
+			<option value="JEE_ADVANCE">JEE Advance</option>
+			<option value="NEET">NEET</option>
+			<option value="NDA">NDA</option>
+			<option value="CLAT">CLAT</option>
+			<option value="OLYMPIAD">Olympiad</option>
+		</select>
+		<input type="text" name="subject" placeholder="Subject" />
+		<div class="input-radio">
+			<label style="min-width: 150px;">Full Syllabus:</label>
+			Yes<input type="radio" name="fullSyllabus" value="y" />No<input type="radio" name="fullSyllabus"
+				value="n" checked />
+		</div>
+		<input type="text" name="topic" placeholder="Topic" />
+		<div class="input-date">
+			<label>Due Date:</label>
+			<input type="date" name="due_date" />
+		</div>
+		<input type="number" name="max_time" placeholder="Max Time (minutes)" min="45" step="30"/>
+		<select name="question_types">
+			<option value="">Select Question Type</option>
+			<option value="MCQ">MCQ</option>
+			<option value="Written">Written</option>
+			<option value="Mix">Mix</option>
+		</select>
+		<select name="difficulty">
+			<option value="">Select Difficulty</option>
+			<option value="expert">Expert</option>
+			<option value="hard">Hard</option>
+			<option value="moderate">Moderate</option>
+			<option value="easy">Easy</option>
+		</select>
+		<input type="number" name="num_questions" placeholder="Number of Questions (max:30)" min="1" max="30"/>
+		<button type="submit" class="generate-assessment-button-comp">Generate</button>
+		<div class="preview">
+			<div class="assessment-container-comp">
+				<div class="assessment-info assessment-info-comp">
+				</div>
+				
+				<div id="questions-container-comp">
+					<!-- Questions will be populated here -->
+				</div>
+			</div>
+		</div>
+		<button class="confirm-assessment-button-comp">Confirm</button>
+	</form>
+</div>
+
+<div class="content-section section-assessment">
+	<div class="content-section-title">Assessments</div>
+	<div class="see-assessment-container">
+
+    </div>
+    <div id="preview-assessment">
+
+    </div>
+    <div class="assessment-result">
+    </div>
+</div>
+
+<div class="content-section section-assessment-comp">
+	<div class="content-section-title">Competition Assessments</div>
+	<div class="see-assessment-container">
+
+    </div>
+    <div id="preview-assessment-comp" class="preview-assessment-comp">
+
+    </div>
+    <div class="assessment-result">
+    </div>
+</div>
+
+<div class="content-section section-events">
+	<div class="content-section-title">Events</div>
+	<div class="see-events-container">
+
+	</div>
+</div>
+
+<div class="content-section section-attendance">
+	<div class="content-section-title">Attendance</div>
+	<form>
+		{% csrf_token %}
+	</form>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/schools/dash-special-student.js' %}"></script>
+{% endblock %}
