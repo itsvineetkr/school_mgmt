@@ -24,6 +24,8 @@ class AssessmentStore(models.Model):
             ("NDA", "NDA"),
             ("CLAT", "CLAT"),
             ("OLYMPIAD", "Olympiad"),
+            ("CSEET", "Company Secretary Executive Entrance Test"),
+            ("CA", "Chartered Accountant"),
         ],
         default="SCHOOL",
     )

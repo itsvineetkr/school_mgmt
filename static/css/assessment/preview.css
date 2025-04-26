@@ -75,6 +75,11 @@ html {
     transition: all 0.2s ease;
 }
 
+.options .correct {
+    border: 1px solid greenyellow;
+    color: white;
+}
+
 .option:hover {
     background-color: #3a3c3d;
 }

@@ -132,6 +132,10 @@ def save_assessment(request):
         "NDA",
         "CLAT",
         "OLYMPIAD",
+        "CSEET",
+        "CA",
+        "CSEET",
+        "CA",
     ]:
         return Response(
             {"error": "Invalid competition value."}, status=status.HTTP_400_BAD_REQUEST
@@ -204,6 +208,10 @@ def get_assessments(request):
         "NDA",
         "CLAT",
         "OLYMPIAD",
+        "CSEET",
+        "CA",
+        "CSEET",
+        "CA",
         "ALL_COMPETITIONS",
     ]:
         return Response(
@@ -231,6 +239,10 @@ def get_assessments(request):
                     "NDA",
                     "CLAT",
                     "OLYMPIAD",
+                    "CSEET",
+                    "CA",
+                    "CSEET",
+                    "CA",
                 ],
             ).values()
             return Response(assessments, status=status.HTTP_200_OK)
@@ -259,6 +271,8 @@ def get_assessments(request):
                     "NDA",
                     "CLAT",
                     "OLYMPIAD",
+                    "CSEET",
+                    "CA",
                 ],
             )
             submitted_assessments = AssessmentSubmission.objects.filter(
@@ -271,6 +285,8 @@ def get_assessments(request):
                     "NDA",
                     "CLAT",
                     "OLYMPIAD",
+                    "CSEET",
+                    "CA",
                 ],
             )
 
@@ -577,6 +593,8 @@ def save_assessment_student(request):
         "NDA",
         "CLAT",
         "OLYMPIAD",
+        "CSEET",
+        "CA",
     ]:
         return Response(
             {"error": "Invalid competition value."}, status=status.HTTP_400_BAD_REQUEST
@@ -789,6 +807,8 @@ def get_assessments_student(request):
         "NDA",
         "CLAT",
         "OLYMPIAD",
+        "CSEET",
+        "CA",
         "ALL_COMPETITIONS",
     ]:
         return Response(
@@ -819,6 +839,10 @@ def get_assessments_student(request):
                 "NDA",
                 "CLAT",
                 "OLYMPIAD",
+                "CSEET",
+                "CA",
+                "CSEET",
+                "CA",
             ],
         )
         submitted_assessments = AssessmentSubmission.objects.filter(
@@ -831,6 +855,10 @@ def get_assessments_student(request):
                 "NDA",
                 "CLAT",
                 "OLYMPIAD",
+                "CSEET",
+                "CA",
+                "CSEET",
+                "CA",
             ],
         )
 
