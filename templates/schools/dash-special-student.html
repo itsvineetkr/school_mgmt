@@ -6,14 +6,19 @@
 {% endblock style %}
 
 {% block sidebarButtons %}
-    <div class="sidebar-button" data-target="section-make-assessment">Make Assessment</div>
-    <div class="sidebar-button" data-target="section-make-competition-assessment">Make Competition Assessment</div>
+	<div class="sidebar-button" data-target="section-make-assessment">Generate Assessment</div>
+	<div class="sidebar-button" data-target="section-make-competition-assessment">Generate Competition Assessment</div>
+	<div class="sidebar-button" data-target="section-create-assessment">Create Assessment</div>
     <div class="sidebar-button sb-assessment" data-target="section-assessment">Assessments</div>
+	<div class="sidebar-button sb-assessment-comp" data-target="section-assessment-comp">Competition</div>
+	<div class="sidebar-button sb-events" data-target="section-events">Events</div>
+    <div class="sidebar-button sb-attendance" data-target="section-attendance">Attendance</div>
 {% endblock sidebarButtons %}
 
 {% block content %}
+
 <div class="content-section section-make-assessment">
-	<div class="content-section-title">Make Assessment</div>
+	<div class="content-section-title">Generate Assessment</div>
 	<form method="post">
 		{% csrf_token %}
 		<input type="text" name="assessment_name" placeholder="Assessment Name" />
@@ -53,7 +58,7 @@
 </div>
 
 <div class="content-section section-make-competition-assessment">
-	<div class="content-section-title">Make Competition Assessment</div>
+	<div class="content-section-title">Generate Competition Assessment</div>
 	<form method="post">
 		{% csrf_token %}
 		<input type="text" name="assessment_name" placeholder="Assessment Name" />
@@ -66,6 +71,8 @@
 			<option value="NDA">NDA</option>
 			<option value="CLAT">CLAT</option>
 			<option value="OLYMPIAD">Olympiad</option>
+			<option value="CA">CA</option>
+			<option value="CSEET">CSEET</option>
 		</select>
 		<input type="text" name="subject" placeholder="Subject" />
 		<div class="input-radio">
@@ -105,6 +112,29 @@
 			</div>
 		</div>
 		<button class="confirm-assessment-button-comp">Confirm</button>
+	</form>
+</div>
+
+<div class="content-section section-create-assessment">
+	<div class="content-section-title">Create Assessment</div>
+	<form method="post">
+		{% csrf_token %}
+		<input type="text" name="assessment_name" placeholder="Assessment Name" />
+		<textarea name="description" placeholder="( Subject / chapter name / Board)"></textarea>
+		<div class="input-date">
+			<label>Due Date:</label>
+			<input type="date" name="due_date" />
+		</div>
+		<input type="number" name="max_time" placeholder="Max Time (minutes)" min="45" step="30"/>
+		<button type="submit" class="create-assessment-button">Create</button>
+		<div class="preview">
+			<div class="assessment-container">
+				<div id="questions-container-create">
+					<!-- Questions will be populated here -->
+				</div>
+			</div>
+		</div>
+		<button class="confirm-create-assessment-button">Confirm</button>
 	</form>
 </div>
 

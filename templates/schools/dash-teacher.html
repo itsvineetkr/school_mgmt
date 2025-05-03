@@ -6,8 +6,9 @@
 {% endblock style %}
 
 {% block sidebarButtons %}
-<div class="sidebar-button" data-target="section-make-assessment">Make Assessment</div>
-<div class="sidebar-button" data-target="section-make-competition-assessment">Make Competition Assessment</div>
+<div class="sidebar-button" data-target="section-make-assessment">Generate Assessment</div>
+<div class="sidebar-button" data-target="section-make-competition-assessment">Generate Competition Assessment</div>
+<div class="sidebar-button" data-target="section-create-assessment">Create Assessment</div>
 <div class="sidebar-button sb-see-assessment-results" data-target="section-see-assessment-results">See Assessment Results</div>
 <div class="sidebar-button sb-see-assessment" data-target="section-see-assessment">See Assessments</div>
 <div class="sidebar-button sb-see-assessment-comp" data-target="section-see-assessment-comp">See Competition Assessments</div>
@@ -19,7 +20,7 @@
 
 {% block content %}
 <div class="content-section section-make-assessment">
-	<div class="content-section-title">Make Assessment</div>
+	<div class="content-section-title">Generate Assessment</div>
 	<form method="post">
 		{% csrf_token %}
 		<input type="text" name="assessment_name" placeholder="Assessment Name" />
@@ -65,7 +66,7 @@
 </div>
 
 <div class="content-section section-make-competition-assessment">
-	<div class="content-section-title">Make Competition Assessment</div>
+	<div class="content-section-title">Generate Competition Assessment</div>
 	<form method="post">
 		{% csrf_token %}
 		<input type="text" name="assessment_name" placeholder="Assessment Name" />
@@ -125,6 +126,35 @@
 			</div>
 		</div>
 		<button class="confirm-assessment-button-comp">Confirm</button>
+	</form>
+</div>
+
+<div class="content-section section-create-assessment">
+	<div class="content-section-title">Create Assessment</div>
+	<form method="post">
+		{% csrf_token %}
+		<input type="text" name="assessment_name" placeholder="Assessment Name" />
+		<textarea name="description" placeholder="( Subject / chapter name / Board)"></textarea>
+        <select name="standard">
+			<option value="">Select Class</option>
+            {% for standard, section in standards %}
+            <option value="{{ standard }}-{{ section }}">{{ standard }}-{{ section }}</option>
+            {% endfor %}
+        </select>
+		<div class="input-date">
+			<label>Due Date:</label>
+			<input type="date" name="due_date" />
+		</div>
+		<input type="number" name="max_time" placeholder="Max Time (minutes)" min="45" step="30"/>
+		<button type="submit" class="create-assessment-button">Create</button>
+		<div class="preview">
+			<div class="assessment-container">
+				<div id="questions-container-create">
+					<!-- Questions will be populated here -->
+				</div>
+			</div>
+		</div>
+		<button class="confirm-create-assessment-button">Confirm</button>
 	</form>
 </div>
 
