@@ -1,0 +1,267 @@
+/* Main container wrapper */
+
+html {
+  scroll-behavior: smooth;
+}
+
+.up-profile-page-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: rgb(30, 32, 33);
+  border-radius: 30px 0 0 30px;
+}
+
+/* Profile container */
+.up-profile-container {
+  width: 100%;
+  max-width: 800px;
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+/* Profile header */
+.up-profile-header {
+  background-color: #2a2a2a;
+  padding: 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.up-profile-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #e0e0e0;
+}
+
+.up-user-name {
+  font-weight: bold;
+  color: #3d5afe;
+}
+
+/* Profile body */
+.up-profile-body {
+  padding: 1.5rem;
+  width: 100%;
+}
+
+/* Profile sections */
+.up-profile-section {
+  margin-bottom: 1.5rem;
+}
+
+.up-section-title {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e0e0e0;
+}
+
+/* Information items */
+.up-info-item {
+  display: flex;
+  margin-bottom: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.up-info-label {
+  width: 120px;
+  color: #a0a0a0;
+  flex-shrink: 0;
+}
+
+.up-info-value {
+  color: #e0e0e0;
+  flex: 1;
+  padding-left: 20px;
+}
+
+/* Button styles */
+.up-edit-button {
+  background-color: transparent;
+  border: none;
+  color: #3d5afe;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: color 0.3s ease;
+}
+
+.up-edit-button:hover {
+  color: #5a78ff;
+}
+
+/* Password change form */
+.up-password-form {
+  background-color: #2a2a2a;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-top: 1rem;
+  display: none;
+  /* Hidden by default */
+}
+
+.up-form-group {
+  margin-bottom: 1rem;
+}
+
+.up-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #a0a0a0;
+}
+
+.up-form-control {
+  width: 100%;
+  padding: 0.7rem;
+  background-color: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.up-form-control:focus {
+  outline: none;
+  border-color: #3d5afe;
+}
+
+.up-password-requirements {
+  font-size: 0.8rem;
+  color: #a0a0a0;
+  margin-top: 0.5rem;
+}
+
+.up-button-group {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.up-btn {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.up-btn-primary {
+  background-color: #3d5afe;
+  color: white;
+}
+
+.up-btn-primary:hover {
+  background-color: #5a78ff;
+}
+
+.up-btn-secondary {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+.up-btn-secondary:hover {
+  background-color: #121212;
+}
+
+/* Footer info */
+.up-last-login-info {
+  font-size: 0.85rem;
+  color: #a0a0a0;
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Alert components */
+.up-alert {
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  text-align: center;
+  display: none;
+}
+
+.up-alert-success {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.up-alert-error {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .up-profile-page-wrapper {
+    padding: 10px;
+  }
+
+  .up-profile-container {
+    border-radius: 8px;
+  }
+
+  .up-profile-header {
+    padding: 1rem;
+  }
+
+  .up-profile-body {
+    padding: 1rem;
+  }
+
+  .up-profile-page-wrapper {
+    border-radius: 0;
+  }
+
+}
+
+@media (max-width: 576px) {
+  .up-profile-page-wrapper {
+    padding: 5px;
+  }
+
+  .up-profile-container {
+    margin: 0;
+    border-radius: 6px;
+  }
+
+  .up-info-item {
+    flex-direction: column;
+  }
+
+  .up-info-label {
+    width: 100%;
+    margin-bottom: 0.3rem;
+  }
+
+  .up-info-value {
+    padding-left: 0;
+  }
+
+  .up-button-group {
+    flex-direction: column;
+  }
+
+  .up-btn {
+    width: 100%;
+  }
+}

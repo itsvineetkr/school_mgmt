@@ -1,0 +1,135 @@
+:root {
+    --primary-color: rgb(109, 109, 109);
+    --accent-color: rgb(149, 149, 150);
+    --border-color: #595959;
+    --text-color: rgb(255, 255, 255);
+    --light-text: #91a2bc;
+}
+
+.assessment-info {
+    padding: 20px;
+    font-weight: 200;
+    border-radius: 10px;
+    background-color: #2a2c2d;
+    margin: 20px 0px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.assessment-info h1 {
+    font-size: 2rem;
+    font-weight: normal;
+}
+
+.assessment-container h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.question-container {
+    line-height: 1.6;
+}
+
+.question-card {
+    background-color: #292c2d;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.question-type {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: var(--accent-color);
+    color: white;
+    font-size: 0.8rem;
+}
+
+.question-text {
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.options {
+    list-style-type: none;
+}
+
+.option {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+}
+
+.options .correct {
+    border: 1px solid greenyellow;
+    color: white;
+}
+
+.option:hover {
+    background-color: #3a3c3d;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-color);
+}
+
+.written-question .question-text {
+    margin-bottom: 12px;
+}
+
+.answer-area {
+    background-color: #3a3c3d;
+    border-radius: 4px;
+    padding: 12px;
+    color: var(--light-text);
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .assessment-container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .question-card {
+        padding: 15px;
+    }
+}
