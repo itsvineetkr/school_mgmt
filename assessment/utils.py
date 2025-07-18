@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configure the Gemini API
-genai.configure(api_key="AIzaSyBEyAmy9hpj3uebAj2ihpW3a2o9fgsGnhk")
+genai.configure(api_key="")
 
 
 class AssessmentGenerator:
